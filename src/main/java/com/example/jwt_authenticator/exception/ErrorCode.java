@@ -1,0 +1,17 @@
+package com.example.jwt_authenticator.exception;
+
+public enum ErrorCode {
+    INVALID_TOKEN,
+    TOKEN_EXPIRED,
+    USER_NOT_FOUND,
+
+    INVALID_SIGNATURE,
+    MALFORMED_TOKEN,
+    UNSUPPORTED_TOKEN,
+    INVALID_SUBJECT,
+
+    REFRESH_TOKEN_INVALID,
+    REFRESH_TOKEN_EXPIRED,
+    REFRESH_TOKEN_REVOKED,
+    TOO_MANY_SESSIONS
+    }

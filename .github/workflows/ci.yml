@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ "master", "main" ]
+
+jobs:
+  backend:
+    name: Backend (Spring Boot)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: base-db_ci
+          POSTGRES_USER: base
+          POSTGRES_PASSWORD: base
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U base -d base-db_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build + tests
+        env:
+          SPRING_PROFILES_ACTIVE: ci
+        run: mvn -B -ntp clean verify
