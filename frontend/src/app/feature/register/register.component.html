@@ -1,0 +1,161 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">
+          Create Account
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Join us today
+        </p>
+      </div>
+
+      <div *ngIf="successMessage"
+           class="mb-6 rounded-lg bg-green-50 border border-green-200 p-4">
+        <div class="flex">
+          <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <p class="ml-3 text-sm text-green-800">
+            {{ successMessage }}. Redirecting to login...
+          </p>
+        </div>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+            Username
+          </label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            class="appearance-none relative block w-full px-4 py-3 border rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150"
+            [class.border-red-500]="(username?.invalid && username?.touched) || getFieldError('username')"
+            [class.border-gray-300]="!username?.invalid || !username?.touched"
+            placeholder="Choose a username"
+          />
+          <p *ngIf="username?.invalid && username?.touched"
+             class="mt-2 text-sm text-red-600">
+            <span *ngIf="username?.errors?.['required']">Username is required</span>
+            <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters</span>
+            <span *ngIf="username?.errors?.['maxlength']">Username cannot exceed 50 characters</span>
+            <span *ngIf="username?.errors?.['pattern']">Username can only contain letters, numbers, dashes and underscores</span>
+          </p>
+          <p *ngIf="getFieldError('username')" class="mt-2 text-sm text-red-600">
+            {{ getFieldError('username') }}
+          </p>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="appearance-none relative block w-full px-4 py-3 border rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150"
+            [class.border-red-500]="(email?.invalid && email?.touched) || getFieldError('email')"
+            [class.border-gray-300]="!email?.invalid || !email?.touched"
+            placeholder="Enter your email"
+          />
+          <p *ngIf="email?.invalid && email?.touched"
+             class="mt-2 text-sm text-red-600">
+            <span *ngIf="email?.errors?.['required']">Email is required</span>
+            <span *ngIf="email?.errors?.['email']">Invalid email format</span>
+            <span *ngIf="email?.errors?.['maxlength']">Email cannot exceed 100 characters</span>
+          </p>
+          <p *ngIf="getFieldError('email')" class="mt-2 text-sm text-red-600">
+            {{ getFieldError('email') }}
+          </p>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="appearance-none relative block w-full px-4 py-3 border rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150"
+            [class.border-red-500]="(password?.invalid && password?.touched) || getFieldError('password')"
+            [class.border-gray-300]="!password?.invalid || !password?.touched"
+            placeholder="Create a strong password"
+          />
+          <p *ngIf="password?.invalid && password?.touched"
+             class="mt-2 text-sm text-red-600">
+            <span *ngIf="password?.errors?.['required']">Password is required</span>
+            <span *ngIf="password?.errors?.['minlength']">Password must be at least 8 characters</span>
+            <span *ngIf="password?.errors?.['maxlength']">Password cannot exceed 128 characters</span>
+            <span *ngIf="password?.errors?.['weakPassword']">Password must contain uppercase, lowercase, number and special character</span>
+          </p>
+          <p *ngIf="getFieldError('password')" class="mt-2 text-sm text-red-600">
+            {{ getFieldError('password') }}
+          </p>
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            class="appearance-none relative block w-full px-4 py-3 border rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150"
+            [class.border-red-500]="confirmPassword?.invalid && confirmPassword?.touched"
+            [class.border-gray-300]="!confirmPassword?.invalid || !confirmPassword?.touched"
+            placeholder="Confirm your password"
+          />
+          <p *ngIf="confirmPassword?.invalid && confirmPassword?.touched"
+             class="mt-2 text-sm text-red-600">
+            <span *ngIf="confirmPassword?.errors?.['required']">Please confirm your password</span>
+          </p>
+          <p *ngIf="registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched"
+             class="mt-2 text-sm text-red-600">
+            Passwords do not match
+          </p>
+        </div>
+
+        <div *ngIf="errorMessage"
+             class="rounded-lg bg-red-50 border border-red-200 p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <p class="ml-3 text-sm text-red-800">
+              {{ errorMessage }}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loading || registerForm.invalid"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <span *ngIf="!loading">Create Account</span>
+          <span *ngIf="loading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creating account...
+          </span>
+        </button>
+
+        <div class="text-center">
+          <p class="text-sm text-gray-600">
+            Already have an account?
+            <a routerLink="/login" class="font-medium text-purple-600 hover:text-purple-500 transition duration-150">
+              Sign in
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">
+          Connexion
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Accédez à votre compte
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Username -->
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+            Nom d'utilisateur
+          </label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            class="appearance-none relative block w-full px-4 py-3 border rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150"
+            [class.border-red-500]="username?.invalid && username?.touched"
+            [class.border-gray-300]="!username?.invalid || !username?.touched"
+            placeholder="Entrez votre nom d'utilisateur"
+          />
+          <p *ngIf="username?.invalid && username?.touched"
+             class="mt-2 text-sm text-red-600">
+            Le nom d'utilisateur est requis
+          </p>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            Mot de passe
+          </label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="appearance-none relative block w-full px-4 py-3 border rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-150"
+            [class.border-red-500]="password?.invalid && password?.touched"
+            [class.border-gray-300]="!password?.invalid || !password?.touched"
+            placeholder="Entrez votre mot de passe"
+          />
+          <p *ngIf="password?.invalid && password?.touched"
+             class="mt-2 text-sm text-red-600">
+            <span *ngIf="password?.errors?.['required']">The password is required</span>
+            <span *ngIf="password?.errors?.['minlength']">The password must contain at least 6 characters.</span>
+          </p>
+        </div>
+
+        <!-- Remember me -->
+        <div class="flex items-center">
+          <input
+            id="rememberMe"
+            type="checkbox"
+            formControlName="rememberMe"
+            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded cursor-pointer"
+          />
+          <label for="rememberMe" class="ml-2 block text-sm text-gray-900 cursor-pointer">
+            Remember me
+          </label>
+        </div>
+
+        <div *ngIf="errorMessage"
+             class="rounded-lg bg-red-50 border border-red-200 p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <p class="ml-3 text-sm text-red-800">
+              {{ errorMessage }}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <span *ngIf="!loading">Log in</span>
+          <span *ngIf="loading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Connexion...
+          </span>
+        </button>
+
+        <div class="text-center">
+          <p class="text-sm text-gray-600">
+            Don't have an account?
+            <a routerLink="/register" class="font-medium text-purple-600 hover:text-purple-500 transition duration-150">
+              Create one
+            </a>
+          </p>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
