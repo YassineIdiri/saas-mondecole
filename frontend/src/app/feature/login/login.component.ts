@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../service/auth.service';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -41,11 +41,12 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         this.authService.saveToken(response.accessToken);
-        this.router.navigate(['/dashboard']);
+        this.authService.saveUsername(response.username); // ← Sauvegarder le username
+        this.router.navigate(['/home']);
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error.error?.message || 'Identifiants invalides';
+        this.errorMessage = error.error?.message || 'Invalid credentials';
       },
       complete: () => {
         this.loading = false;

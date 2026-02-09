@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { LoginRequest, RegisterRequest, AuthResponse, RegisterResponse } from '../model/models';
 import { environment } from '../../environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,10 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/api/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   register(data: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, data);
@@ -31,7 +35,12 @@ export class AuthService {
   logout(): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/logout`, {}, {
       withCredentials: true
-    });
+    }).pipe(
+      tap(() => {
+        this.clearToken();
+        this.router.navigate(['/login']);
+      })
+    );
   }
 
   getToken(): string | null {
@@ -48,5 +57,13 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+
+  getCurrentUsername(): string | null {
+    return localStorage.getItem('username');
+  }
+
+  saveUsername(username: string): void {
+    localStorage.setItem('username', username);
   }
 }
