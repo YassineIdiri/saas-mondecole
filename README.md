@@ -14,79 +14,79 @@
 
 ---
 
-## 🎯 Vue d'ensemble
+## 🎯 Overview
 
-### Qu'est-ce que c'est ?
+### What is it?
 
-**Mon École Pocket** est une plateforme LMS (Learning Management System) complète permettant à des **organisations** (écoles, entreprises, centres de formation) de créer leur propre espace d'apprentissage isolé avec :
+**Mondecole** is a complete Learning Management System (LMS) platform that allows **organizations** (schools, companies, training centers) to create their own isolated learning space with:
 
-- **Gestion des utilisateurs** (Admin, Professeurs, Étudiants)
-- **Création de cours** par les professeurs
-- **Suivi de progression** pour les étudiants
-- **Isolation totale** entre organisations (multi-tenant)
+- **User management** (Admins, Teachers, Students)
+- **Course creation** by teachers
+- **Progress tracking** for students
+- **Complete isolation** between organizations (multi-tenant)
 
-### Pourquoi "multi-tenant" ?
+### Why "multi-tenant"?
 
-Imaginez une application unique qui héberge plusieurs écoles :
-- École A → Leurs professeurs, leurs étudiants, leurs cours
-- École B → Leurs professeurs, leurs étudiants, leurs cours
-- École C → Leurs professeurs, leurs étudiants, leurs cours
+Imagine a single application that hosts several schools:
+- School A → Their teachers, their students, their courses
+- School B → Their teachers, their students, their courses
+- School C → Their teachers, their students, their courses
 
-**Chaque organisation est complètement isolée des autres**, mais toutes partagent la même infrastructure technique.
+**Each organization is completely isolated from the others**, but all share the same technical infrastructure.
 
-### Cas d'usage
+### Use Cases
 
-1. **Entreprise de formation professionnelle** : Chaque client (entreprise) a son propre espace
-2. **Réseau d'écoles** : Chaque établissement a son instance isolée
-3. **Plateforme SaaS éducative** : Chaque abonné a son organisation privée
+1. **Professional Training Company**: Each client (company) has their own space
+2. **School Network**: Each institution has its own isolated instance
+3. **Educational SaaS Platform**: Each subscriber has their own private organization
 
 ---
 
-## 🏗️ Architecture Technique
+## 🏗️ Technical Architecture
 
-### Stack Technologique
+### Technology Stack
 
-**Backend :**
+**Backend:**
 - **Spring Boot 4.0.2** (Java)
-- **PostgreSQL** (base de données)
-- **JWT** pour l'authentification
-- **Multi-tenant** avec isolation au niveau BDD
+- **PostgreSQL** (database)
+- **JWT** for authentication
+- **Multi-tenant** with database isolation
 
-**Frontend :**
+**Frontend:**
 - **Angular 18** (zoneless)
-- **Tailwind CSS** pour le design
+- **Tailwind CSS** for design
 - **Reactive programming** (RxJS)
 
-### Architecture en couches
+### Layered Architecture
 
 ```
 ┌─────────────────────────────────────────────┐
 │           FRONTEND (Angular 18)             │
-│  ┌──────────┬──────────┬──────────┐        │
-│  │  Admin   │ Teacher  │ Student  │        │
-│  │   UI     │   UI     │   UI     │        │
-│  └──────────┴──────────┴──────────┘        │
+│  ┌──────────┬──────────┬──────────┐         │
+│  │  Admin   │ Teacher  │ Student  │         │
+│  │   UI     │   UI     │   UI     │         │
+│  └──────────┴──────────┴──────────┘         │
 │           Services (HTTP calls)             │
 └─────────────────┬───────────────────────────┘
                   │ REST API
 ┌─────────────────▼───────────────────────────┐
 │          BACKEND (Spring Boot)              │
 │  ┌─────────────────────────────────┐        │
-│  │     Security Layer               │        │
-│  │  - JWT Authentication            │        │
-│  │  - Multi-tenant Filter           │        │
-│  │  - Role-based Authorization      │        │
+│  │     Security Layer              │        │
+│  │  - JWT Authentication           │        │
+│  │  - Multi-tenant Filter          │        │
+│  │  - Role-based Authorization     │        │
 │  └─────────────────────────────────┘        │
 │  ┌─────────────────────────────────┐        │
-│  │     Business Logic               │        │
-│  │  - CourseService                 │        │
-│  │  - EnrollmentService             │        │
-│  │  - UserService                   │        │
+│  │     Business Logic              │        │
+│  │  - CourseService                │        │
+│  │  - EnrollmentService            │        │
+│  │  - UserService                  │        │
 │  └─────────────────────────────────┘        │
 │  ┌─────────────────────────────────┐        │
-│  │     Data Access Layer            │        │
-│  │  - Repositories (JPA)            │        │
-│  │  - Entities                      │        │
+│  │     Data Access Layer           │        │
+│  │  - Repositories (JPA)           │        │
+│  │  - Entities                     │        │
 │  └─────────────────────────────────┘        │
 └─────────────────┬───────────────────────────┘
                   │
@@ -104,13 +104,13 @@ Imaginez une application unique qui héberge plusieurs écoles :
 
 ---
 
-## 🔒 Sécurité & Multi-tenancy
+## 🔒 Security & Multi-tenant
 
-### Comment fonctionne l'isolation multi-tenant ?
+### How does multi-tenant isolation work?
 
-#### 1. **Au niveau de la base de données**
+#### 1. **At the database level**
 
-Toutes les tables ont une colonne `organization_id` :
+All tables have an `organization_id` column:
 
 ```sql
 CREATE TABLE courses (
@@ -124,82 +124,84 @@ CREATE TABLE courses (
 );
 ```
 
-**Toutes les requêtes SQL incluent automatiquement le filtre d'organisation.**
+**All SQL queries automatically include the organization filter.**
 
-#### 2. **Au niveau du backend (TenantFilter)**
+#### 2. **At the backend level (TenantFilter)**
 
-Un filtre Spring intercepte **chaque requête HTTP** pour :
+A Spring filter intercepts **each HTTP request** to:
 
-1. **Extraire l'organization_id** depuis :
-   - Le JWT (pour les utilisateurs connectés)
-   - Le body (pour le login)
+1. **Extract the organization_id** from:
 
-2. **Stocker l'ID dans TenantContext** (ThreadLocal)
+- The JWT (for logged-in users)
 
-3. **Toutes les requêtes DB utilisent cet ID**
+- The body (for login)
 
+2. **Store the ID in TenantContext** (ThreadLocal)
+
+3. **All DB queries use this ID**
+4. 
 ```java
 // Exemple simplifié
 @Component
 public class TenantFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, ...) {
-        // 1. Extraire organization_id du JWT
+        // 1. Extract organization_id from the JWT
         Long orgId = jwtService.extractOrganizationId(token);
         
-        // 2. Stocker dans le contexte
+        // 2. Store in context
         TenantContext.setTenantId(orgId);
         
-        // 3. Continuer la requête
+        // 3. Continue the request
         filterChain.doFilter(request, response);
         
-        // 4. Nettoyer après
+        // 4. Clean after
         TenantContext.clear();
     }
 }
 ```
 
-**Résultat :** Un professeur de l'École A ne peut **jamais** voir les cours de l'École B, même s'il essaie de forcer l'URL.
+**Result:** A teacher at School A can **never** see the courses at School B, even if they try to force the URL.
 
-#### 3. **Au niveau de l'authentification (JWT)**
+#### 3. **At the authentication level (JWT)**
 
-Le JWT contient :
+The JWT contains:
 
 ```json
 {
   "sub": "jean.dupont",           // username
   "userId": 42,
-  "organizationId": 1,             // ✅ ID de l'organisation
+  "organizationId": 1,            // ✅ Organization ID
   "role": "TEACHER",
   "iat": 1234567890,
   "exp": 1234571490
 }
 ```
 
-**Le token lie l'utilisateur à son organisation** : impossible d'accéder aux données d'une autre organisation.
+**The token links the user to their organization:** It is impossible to access data from another organization.
 
-### Sécurité des rôles
+### Role Security
 
-3 rôles principaux :
+3 main roles:
 
-1. **ADMIN** : Gestion complète de l'organisation
-2. **TEACHER** : Création et gestion de cours
-3. **STUDENT** : Inscription et suivi de cours
+1. **ADMIN**: Full management of the organization
+2. **TEACHER**: Creation and management of courses
+3. **STUDENT**: Course registration and tracking
 
-**Protection côté backend :**
+**Backend protection:**
 
 ```java
 @PreAuthorize("hasRole('ADMIN')")
 public void deleteUser(Long userId) {
-    // Seuls les admins peuvent supprimer des utilisateurs
+   // Only admins can delete users
 }
 
 @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
 public void createCourse(CreateCourseRequest request) {
-    // Les profs et admins peuvent créer des cours
+    // Teachers and admins can create courses
 }
 ```
 
-**Protection côté frontend :**
+**Frontend protection:**
 
 ```typescript
 // Guards Angular
@@ -216,11 +218,11 @@ export const adminGuard: CanActivateFn = (route, state) => {
 
 ---
 
-## 👥 Workflows Utilisateurs
+## User Workflows
 
-### 1️⃣ Workflow ORGANISATION (Bootstrap)
+### 1️⃣ Workflow ORGANISATION
 
-**Création d'une nouvelle organisation :**
+**Creation of a new organization:**
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -229,7 +231,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
 └──────────────┬──────────────────────────────────┘
                │
 ┌──────────────▼──────────────────────────────────┐
-│ 2. Formulaire d'inscription                     │
+│ 2. Registration form                            │
 │    - Organization name: "École Strasbourg"      │
 │    - Slug: "ecole-strasbourg"                   │
 │    - Admin username: "admin"                    │
@@ -238,7 +240,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
 └──────────────┬──────────────────────────────────┘
                │
 ┌──────────────▼──────────────────────────────────┐
-│ 3. Backend crée :                               │
+│ 3. Backend createde :                           │
 │    ✅ Organization (id: 1)                      │
 │    ✅ Admin user (organization_id: 1)           │
 │    ✅ Hash du password                          │
@@ -250,39 +252,39 @@ export const adminGuard: CanActivateFn = (route, state) => {
 └─────────────────────────────────────────────────┘
 ```
 
-**L'organisation est maintenant créée et isolée.**
+**The organization is now created and isolated.**
 
 ---
 
 ### 2️⃣ Workflow ADMIN
 
-**Mission :** Gérer les utilisateurs (professeurs et étudiants)
+**Mission:** Manage users (professors and students)
 
-#### A. Connexion Admin
+#### A. Admin Login
 
 ```
 ┌─────────────────────────────────────────────────┐
-│ 1. Page Login                                   │
+│ 1. Login Page                                   │
 │    - Username: "admin"                          │
 │    - Password: ********                         │
 └──────────────┬──────────────────────────────────┘
                │
 ┌──────────────▼──────────────────────────────────┐
-│ 2. Backend vérifie :                            │
-│    - Lookup organization_id pour "admin"        │
-│    - Vérification password                      │
-│    - Génération JWT avec organizationId: 1      │
+│ 2. Backend checks:                              │
+│    - Lookup organization_id for "admin"         │
+│    - Password verification                      │
+│    - JWT generation with organizationId: 1      │
 └──────────────┬──────────────────────────────────┘
                │
 ┌──────────────▼──────────────────────────────────┐
-│ 3. Frontend stocke JWT                          │
-│    - Redirection vers /admin/dashboard          │
+│ 3. Frontend stores JWT                          │
+│    - Redirect to /admin/dashboard               │
 └─────────────────────────────────────────────────┘
 ```
 
 #### B. Dashboard Admin
 
-L'admin voit :
+The admin sees:
 
 ```
 ╔═══════════════════════════════════════════════╗
@@ -290,108 +292,109 @@ L'admin voit :
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
 ║  📊 STATS                                     ║
-║  ┌──────────┬──────────┬──────────┐          ║
-║  │ 15 Users │ 5 Profs  │ 10 Élèves│          ║
-║  └──────────┴──────────┴──────────┘          ║
+║  ┌──────────┬─────────---─┬────────--──┐      ║
+║  │ 15 Users │ 5 Teachers  │ 10 Students│      ║
+║  └──────────┴────────---──┴────────--──┘      ║
 ║                                               ║
 ║  👥 TEACHERS                                  ║
-║  ┌─────────────────────────────────────────┐ ║
-║  │ Jean Dupont    | Active  | [🔒] [❌]   │ ║
-║  │ Marie Martin   | Active  | [🔒] [❌]   │ ║
-║  └─────────────────────────────────────────┘ ║
+║  ┌─────────────────────────────────────────┐  ║
+║  │ Jean Dupont    | Active  | [🔒] [❌]    │  ║
+║  │ Marie Martin   | Active  | [🔒] [❌]    │  ║
+║  └─────────────────────────────────────────┘  ║
 ║                                               ║
 ║  🎓 STUDENTS                                  ║
-║  ┌─────────────────────────────────────────┐ ║
-║  │ Pierre Durand  | Active  | [🔒] [❌]   │ ║
-║  │ Sophie Bernard | Locked  | [🔓] [❌]   │ ║
-║  └─────────────────────────────────────────┘ ║
+║  ┌─────────────────────────────────────────┐  ║
+║  │ Pierre Durand  | Active  | [🔒] [❌]    │  ║
+║  │ Sophie Bernard | Locked  | [🔓] [❌]    │  ║
+║  └─────────────────────────────────────────┘  ║
 ╚═══════════════════════════════════════════════╝
 ```
 
-**Actions disponibles :**
-- ✅ **Toggle Active/Inactive** : Désactiver un utilisateur
-- ✅ **Toggle Lock/Unlock** : Verrouiller un compte
-- ✅ **Delete User** : Supprimer définitivement
-- ✅ **Pagination** : Naviguer entre les pages
+**Available Actions:**
+- ✅ **Toggle Active/Inactive**: Deactivate a user
+- ✅ **Toggle Lock/Unlock**: Lock an account
+- ✅ **Delete User**: Permanently delete a user
+- ✅ **Pagination**: Navigate between pages
+- 
+#### C. User Invitation
 
-#### C. Invitation d'utilisateurs
-
-**Flow d'invitation :**
+**Invitation flow:**
 
 ```
-Admin génère un lien d'invitation
+Admin generates an invitation link
          │
          ▼
-Envoie le lien à jean.dupont@ecole.fr
+Send the link to jean.dupont@ecole.fr
          │
          ▼
-Jean clique sur le lien
+Jean clicks on the link
          │
          ▼
-Page "Join Organization"
-   - Email pré-rempli
-   - Choix de username
-   - Choix de password
-   - Sélection du rôle (TEACHER/STUDENT)
+"Join Organization" page
+- Pre-filled email address
+- Username selection
+- Password selection
+- Role selection (TEACHER/STUDENT)
          │
          ▼
-Backend crée le user avec organization_id = 1
+The backend creates the user with organization_id = 1
          │
          ▼
-Jean peut se connecter
+Jean can log in
 ```
 
 ---
 
-### 3️⃣ Workflow TEACHER (Professeur)
+### 3️⃣ Workflow TEACHER
 
-**Mission :** Créer et gérer des cours
+**Mission:** Create and manage courses
 
-#### A. Connexion Professeur
+#### A. Teacher Login
 
-Identique au login admin, mais avec `role: TEACHER` dans le JWT.
+Same as admin login, but with `role: TEACHER` in the JWT.
 
-**Redirection automatique vers `/teacher/courses`**
+**Automatic redirection to `/teacher/courses`**
 
-#### B. Liste des cours
+#### B. Course List
 
 ```
 ╔═══════════════════════════════════════════════╗
 ║          MY COURSES                           ║
 ╠═══════════════════════════════════════════════╣
-║  [All] [Published] [Draft]                   ║
+║  [All] [Published] [Draft]                    ║
 ║                                  [+ Create]   ║
 ║                                               ║
-║  ┌─────────────────────────────────────────┐ ║
-║  │ 📘 Introduction to JavaScript            │ ║
-║  │ Beginner | Programming                   │ ║
-║  │ [Published] 25 students                  │ ║
-║  │ Created Jan 15, 2026                     │ ║
-║  │                                           │ ║
-║  │ [Edit] [Unpublish] [Delete]              │ ║
-║  └─────────────────────────────────────────┘ ║
+║  ┌─────────────────────────────────────────┐  ║
+║  │ 📘 Introduction to JavaScript           │  ║
+║  │ Beginner | Programming                  │  ║
+║  │ [Published] 25 students                 │  ║
+║  │ Created Jan 15, 2026                    │  ║
+║  │                                         │  ║
+║  │ [Edit] [Unpublish] [Delete]             │  ║
+║  └─────────────────────────────────────────┘  ║
 ║                                               ║
-║  ┌─────────────────────────────────────────┐ ║
-║  │ 📗 Advanced React Patterns               │ ║
-║  │ Advanced | Programming                   │ ║
-║  │ [Draft] 0 students                       │ ║
-║  │ Created Feb 10, 2026                     │ ║
-║  │                                           │ ║
-║  │ [Edit] [Publish] [Delete]                │ ║
-║  └─────────────────────────────────────────┘ ║
+║  ┌─────────────────────────────────────────┐  ║
+║  │ 📗 Advanced React Patterns              │  ║
+║  │ Advanced | Programming                  │  ║
+║  │ [Draft] 0 students                      │  ║
+║  │ Created Feb 10, 2026                    │  ║
+║  │                                         │  ║
+║  │ [Edit] [Publish] [Delete]               │  ║
+║  └─────────────────────────────────────────┘  ║
 ╚═══════════════════════════════════════════════╝
 ```
 
-**Filtres disponibles :**
-- **All** : Tous les cours
-- **Published** : Cours visibles par les étudiants
-- **Draft** : Cours en cours de création
+**Available Filters:**
+- **All:** All courses
+- **Published:** Courses visible to students
+- **Draft:** Courses currently being created
 
-#### C. Création d'un cours
+#### C. Creating a Course
 
-**Formulaire en 2 sections :**
+**Form in 2 sections:**
 
-**Section 1 : Basic Information**
+**Section 1: Basic Information**
+
 ```
 ┌─────────────────────────────────────────┐
 │ Course Title *                          │
@@ -404,10 +407,10 @@ Identique au login admin, mais avec `role: TEACHER` dans le JWT.
 │ │ Learn Python from scratch...        │ │
 │ └─────────────────────────────────────┘ │
 │                                         │
-│ Category          Level                │
-│ ┌──────────────┐ ┌──────────────────┐  │
-│ │ Programming  │ │ BEGINNER         │  │
-│ └──────────────┘ └──────────────────┘  │
+│ Category          Level                 │
+│ ┌──────────────┐ ┌──────────────────┐   │
+│ │ Programming  │ │ BEGINNER         │   │
+│ └──────────────┘ └──────────────────┘   │
 │                                         │
 │ Estimated Hours                         │
 │ ┌─────────────────────────────────────┐ │
@@ -416,7 +419,7 @@ Identique au login admin, mais avec `role: TEACHER` dans le JWT.
 └─────────────────────────────────────────┘
 ```
 
-**Section 2 : Detailed Information**
+**Section 2: Detailed Information**
 ```
 ┌─────────────────────────────────────────┐
 │ Course Description                      │
@@ -440,31 +443,31 @@ Identique au login admin, mais avec `role: TEACHER` dans le JWT.
 └─────────────────────────────────────────┘
 ```
 
-**Backend crée :**
-- ✅ Course avec `organization_id = 1`
+**Backend created:**
+- ✅ Course with `organization_id = 1`
 - ✅ `author_id = professor_id`
-- ✅ `slug` auto-généré (ex: "introduction-to-python")
-- ✅ `published = false` (draft par défaut)
+- ✅ Auto-generated `slug` (e.g., "introduction-to-python")
+- ✅ `published = false` (default draft)
 
-#### D. Publication d'un cours
+#### D. Publishing a Course
 
-**Avant publication :** Le cours est invisible pour les étudiants
+**Before publication:** The course is invisible to students
 
-**Clic sur "Publish" :**
+**Click on "Publish":**
 ```
 Course.published = true
 Course.publishedAt = NOW()
 ```
 
-**Après publication :** Le cours apparaît dans le catalogue étudiant
+**After publication:** The course appears in the student catalog
 
 ---
 
-### 4️⃣ Workflow STUDENT (Étudiant)
+### 4️⃣ Student Workflow
 
-**Mission :** Découvrir, s'inscrire, et suivre des cours
+**Mission:** Discover, enroll in, and take courses
 
-#### A. Dashboard Étudiant
+#### A. Student Dashboard
 
 ```
 ╔═══════════════════════════════════════════════╗
@@ -472,55 +475,55 @@ Course.publishedAt = NOW()
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
 ║  📊 STATS                                     ║
-║  ┌──────────┬──────────┬──────────┬────────┐ ║
-║  │ 5 Cours  │ 3 En     │ 2 Termi- │ 65%    │ ║
-║  │ Inscrits │ Cours    │ nés      │ Moy.   │ ║
-║  └──────────┴──────────┴──────────┴────────┘ ║
+║  ┌──────────┬──────────┬──────────┬────────┐  ║
+║  │ 5 Cours  │ 3 En     │ 2 Termi- │ 65%    │  ║
+║  │ Inscrits │ Cours    │ nés      │ Moy.   │  ║
+║  └──────────┴──────────┴──────────┴────────┘  ║
 ║                                               ║
 ║  🔥 CONTINUE LEARNING                         ║
-║  ┌─────────────────────────────────────────┐ ║
-║  │ Introduction to Python                  │ ║
-║  │ Prof. Jean Dupont                       │ ║
-║  │ ████████░░░░░░░░░░ 45%                  │ ║
-║  │ Last accessed: 2 days ago               │ ║
-║  └─────────────────────────────────────────┘ ║
+║  ┌─────────────────────────────────────────┐  ║
+║  │ Introduction to Python                  │  ║
+║  │ Prof. Jean Dupont                       │  ║
+║  │ ████████░░░░░░░░░░ 45%                  │  ║
+║  │ Last accessed: 2 days ago               │  ║
+║  └─────────────────────────────────────────┘  ║
 ║                                               ║
 ║  📚 QUICK ACCESS                              ║
-║  [Browse Catalog] [My Courses] [Certificates]║
+║  [Browse Catalog] [My Courses] [Certificates] ║
 ╚═══════════════════════════════════════════════╝
 ```
 
-#### B. Catalogue de cours
+#### B. Course Catalog
 
 ```
 ╔═══════════════════════════════════════════════╗
 ║          COURSE CATALOG                       ║
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
-║  ┌────────┐  ┌────────┐  ┌────────┐          ║
-║  │ 📘     │  │ 📗     │  │ 📙     │          ║
-║  │        │  │        │  │        │          ║
-║  │ Python │  │ React  │  │ DevOps │          ║
-║  │        │  │        │  │        │          ║
-║  │ BEGIN. │  │ ADV.   │  │ INTER. │          ║
-║  │ 20h    │  │ 15h    │  │ 30h    │          ║
-║  │ 42 🎓  │  │ 18 🎓  │  │ 25 🎓  │          ║
-║  │        │  │        │  │        │          ║
-║  │[ENROLL]│  │███ 30% │  │[ENROLL]│          ║
-║  └────────┘  └────────┘  └────────┘          ║
+║  ┌────────┐  ┌────────┐  ┌────────┐           ║
+║  │ 📘     │  │ 📗     │  │ 📙     │           ║
+║  │        │  │        │  │        │           ║
+║  │ Python │  │ React  │  │ DevOps │           ║
+║  │        │  │        │  │        │           ║
+║  │ BEGIN. │  │ ADV.   │  │ INTER. │           ║
+║  │ 20h    │  │ 15h    │  │ 30h    │           ║
+║  │ 42 🎓  │  │ 18 🎓  │  │ 25 🎓  │           ║
+║  │        │  │        │  │        │           ║
+║  │[ENROLL]│  │███ 30% │  │[ENROLL]│           ║
+║  └────────┘  └────────┘  └────────┘           ║
 ║                                               ║
 ║         [Previous] Page 1 of 5 [Next]         ║
 ╚═══════════════════════════════════════════════╝
 ```
 
-**Légende :**
-- 📘 Cours disponible
-- ███ 30% = Cours déjà inscrit avec progression
-- 🎓 Nombre d'étudiants inscrits
+**Legend:**
+- 📘 Course available
+- ███ 30% = Course already enrolled with progress
+- 🎓 Number of enrolled students
 
-#### C. Détail d'un cours
+#### C. Course Details
 
-**Page de détail :**
+**Detail Page:**
 
 ```
 ╔═══════════════════════════════════════════════╗
@@ -534,15 +537,15 @@ Course.publishedAt = NOW()
 ║                                               ║
 ║  👨‍🏫 Jean Dupont  |  👥 42 students  |  ⏱️ 20h ║
 ║                                               ║
-║  ┌──────────────────────────────────────────┐║
-║  │  📸 [Course Thumbnail]                   │║
-║  │                                          │║
-║  │          [ENROLL NOW]                    │║
-║  │                                          │║
-║  │  Total Lessons: 25                       │║
-║  │  Duration: 20 hours                      │║
-║  │  Language: FR                            │║
-║  └──────────────────────────────────────────┘║
+║  ┌──────────────────────────────────────────┐ ║
+║  │  📸 [Course Thumbnail]                   │ ║
+║  │                                          │ ║
+║  │          [ENROLL NOW]                    │ ║
+║  │                                          │ ║
+║  │  Total Lessons: 25                       │ ║
+║  │  Duration: 20 hours                      │ ║
+║  │  Language: FR                            │ ║
+║  └──────────────────────────────────────────┘ ║
 ║                                               ║
 ║  📖 ABOUT THIS COURSE                         ║
 ║  This comprehensive Python course...          ║
@@ -554,157 +557,153 @@ Course.publishedAt = NOW()
 ║                                               ║
 ║  📚 COURSE CURRICULUM                         ║
 ║  1. Introduction                              ║
-║     ▢ What is Python?        [🎥 5min]       ║
-║     ▢ Setup Environment      [📄 10min]      ║
+║     ▢ What is Python?        [🎥 5min]        ║
+║     ▢ Setup Environment      [📄 10min]       ║
 ║  2. Variables & Data Types                    ║
-║     ▢ Numbers                [🎥 15min]      ║
-║     ▢ Strings                [🎥 20min]      ║
-║     ▢ Quiz                   [📝 10min]      ║
+║     ▢ Numbers                [🎥 15min]       ║
+║     ▢ Strings                [🎥 20min]       ║
+║     ▢ Quiz                   [📝 10min]       ║
 ╚═══════════════════════════════════════════════╝
 ```
 
-**Clic sur "Enroll Now" :**
+**Click on "Enroll Now":**
 
-Backend crée :
+Backend created:
 ```java
 CourseEnrollment enrollment = {
-    organizationId: 1,
-    studentId: 42,
-    courseId: 5,
-    progressPercent: 0,
-    completed: false
+organizationId: 1,
+studentId: 42,
+courseId: 5,
+progressPercent: 0,
+completed: false
 }
 ```
 
-**Page rafraîchie :**
-- ❌ "Enroll Now" disparaît
-- ✅ "Start Learning" apparaît
-- ✅ Progress bar à 0%
-- ✅ Leçons deviennent cliquables
+**Page refreshed:**
+- ❌ "Enroll Now" disappears
+- ✅ "Start Learning" appears
+- ✅ Progress bar at 0%
+- ✅ Lessons become clickable
 
-#### D. Viewer de leçon
+#### D. Lesson Viewer
 
-**Interface du player :**
+**Player Interface:**
 
 ```
 ╔═══════════════════════════════════════════════╗
-║ [✕] Introduction | Lesson 1 of 25    [65% ✓] ║
+║ [✕] Introduction | Lesson 1 of 25    [65% ✓]  ║
 ╠═══════════════════════════════════════════════╣
 ║                                               ║
-║  ┌─────────────────────────────────────────┐ ║
-║  │                                         │ ║
-║  │         [VIDEO PLAYER]                  │ ║
-║  │      ▶️ What is Python?                 │ ║
-║  │                                         │ ║
-║  │    ━━━━━━━━━━━━━━━━░░░░  2:30 / 5:00   │ ║
-║  │                                         │ ║
-║  └─────────────────────────────────────────┘ ║
+║  ┌─────────────────────────────────────────┐  ║
+║  │                                         │  ║
+║  │         [VIDEO PLAYER]                  │  ║
+║  │      ▶️ What is Python?                 │  ║
+║  │                                         │  ║
+║  │    ━━━━━━━━━━━━━━━━░░░░  2:30 / 5:00    │  ║
+║  │                                         │  ║
+║  └─────────────────────────────────────────┘  ║
 ║                                               ║
 ║  📖 ABOUT THIS LESSON                         ║
 ║  In this lesson, you'll discover what Python  ║
 ║  is and why it's one of the most popular...   ║
 ║                                               ║
-║  ┌──────────────────────────┐                ║
-║  │   [✓ Mark as Complete]   │                ║
-║  └──────────────────────────┘                ║
+║  ┌──────────────────────────┐                 ║
+║  │   [✓ Mark as Complete]   │                 ║
+║  └──────────────────────────┘                 ║
 ║                                               ║
-║  [← Previous Lesson]    [Next Lesson →]      ║
+║  [← Previous Lesson]    [Next Lesson →]       ║
 ║                                               ║
 ╠═══════════════════════════════════════════════╣
 ║  YOUR PROGRESS                                ║
-║  ┌──────────────────┐                        ║
-║  │       65%        │ Status: In Progress    ║
-║  │    ◐◐◐◐◑◑◑◑◑◑    │ Lesson: 1/25           ║
+║  ┌──────────────────┐                         ║
+║  │       65%        │ Status: In Progress     ║
+║  │    ◐◐◐◐◑◑◑◑◑◑    │ Lesson: 1/25            ║
 ║  └──────────────────┘ Duration: 5 min         ║
 ╚═══════════════════════════════════════════════╝
 ```
 
-**Types de leçons supportés :**
+**Supported Lesson Types:**
 
 1. **VIDEO** 🎥
-   - Player vidéo intégré (YouTube, Vimeo)
-   - Sauvegarde automatique de la position
-   - Durée trackée
+- Integrated video player (YouTube, Vimeo)
+- Automatic position saving
+- Tracked time
 
 2. **TEXT** 📝
-   - Contenu textuel formaté
-   - Auto-progression toutes les 10 secondes
-   - Scroll tracking
+- Formatted text content
+- Auto-progress every 10 seconds
+- Scroll tracking
 
 3. **DOCUMENT** 📄
-   - Fichiers PDF, DOCX téléchargeables
-   - Bouton de téléchargement
-   - Marquage manuel de complétion
+- Downloadable PDF and DOCX files
+- Download button
+- Manual completion marking
 
 4. **QUIZ** 📝
-   - (Placeholder pour l'instant)
-   - Questions à choix multiples
-   - Scoring automatique
+- (Currently a placeholder)
+- Multiple-choice questions
+- Automatic scoring
 
 5. **ASSIGNMENT** 📋
-   - (Placeholder pour l'instant)
-   - Upload de devoirs
-   - Correction par le prof
+- (Currently a placeholder)
+- Assignment upload
+- Teacher grading
 
-**Tracking de progression :**
+**Progress Tracking:**
 
 ```java
-// À chaque interaction
+// With each interaction
 LessonProgress progress = {
     studentId: 42,
     lessonId: 1,
-    progressPercent: 45,        // Auto-incrémenté
-    lastPositionSeconds: 150,   // Pour les vidéos
+    progressPercent: 45,        // Auto-incrementing
+    lastPositionSeconds: 150,   // For the videos
     completed: false,
     viewCount: 3
 }
 
-// Sauvegarde toutes les 10 secondes
-```
+// Saves every 10 seconds
 
-**Calcul de la progression du cours :**
+**Course progress calculation:**
 
-```
-Progression = (Leçons complétées / Total leçons) × 100
+**Progress = (Completed lessons / Total lessons) × 100
 
-Exemple :
-- Total leçons : 25
-- Complétées : 16
-- Progression : 64%
-```
+Example:
+- Total lessons: 25
+- Completed: 16
+- Progress: 64%
 
-**Complétion automatique du cours :**
+**Automatic course completion:**
 
 ```java
 if (progressPercent == 100 && !enrollment.completed) {
     enrollment.completed = true;
     enrollment.completedAt = NOW();
     
-    // 🎉 Génération du certificat (à venir)
+  // 🎉 Certificate generation (coming soon)
 }
 ```
 
 ---
 
-## 🎯 Fonctionnalités Détaillées
+## 🎯 Detailed Features
 
-### 1. Système d'authentification
+### 1. Authentication System
 
-#### A. Login multi-étapes
-
+#### A. Multi-step Login
 ```
 ┌─────────────────────────────────────────┐
-│ 1. User entre username "monprof"        │
+│ 1. User between username "myteacher"    │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 2. Frontend appelle:                    │
+│ 2. Frontend call:                    │
 │    GET /api/auth/user-organization      │
 │    ?username=monprof                    │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 3. Backend répond:                      │
+│ 3. Backend responds:                    │
 │    {                                    │
 │      organizationId: 1,                 │
 │      organizationName: "École Stras",   │
@@ -714,13 +713,13 @@ if (progressPercent == 100 && !enrollment.completed) {
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 4. Frontend affiche:                    │
+│ 4. Frontend display:                    │
 │    "Logging in to École Strasbourg"     │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 5. User entre password                  │
-│    Frontend envoie:                     │
+│ 5. User enter password                  │
+│    Frontend send:                       │
 │    POST /api/auth/login                 │
 │    Headers: X-Organization-Id: 1        │
 │    Body: {username, password}           │
@@ -728,48 +727,48 @@ if (progressPercent == 100 && !enrollment.completed) {
                │
 ┌──────────────▼──────────────────────────┐
 │ 6. Backend:                             │
-│    - Vérifie password                   │
-│    - Génère JWT avec orgId: 1           │
+│    - Verify password                    │
+│    - Generates JWT with orgId:          │
 │    - Set refresh_token cookie (30j)     │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
 │ 7. Frontend:                            │
-│    - Stocke access_token (1h)           │
-│    - Redirige selon rôle                │
+│    - Store access_token (1h)            │
+│    - Redirects according to role        │
 └─────────────────────────────────────────┘
 ```
 
-**Pourquoi cette approche ?**
+**Why this approach?**
 
-- ✅ Empêche l'énumération d'utilisateurs
-- ✅ Affiche le nom de l'organisation (UX)
-- ✅ Valide l'existence de l'utilisateur avant le password
-- ✅ Multi-tenant transparent pour l'utilisateur
+- ✅ Prevents user enumeration
+- ✅ Displays the organization name (UX)
+- ✅ Validates user existence before the password
+- ✅ Transparent multi-tenant for the user
 
-#### B. Refresh token automatique
+#### B. Automatic token refresh
 
-**Problème :** Access token expire après 1h
+**Problem:** Access token expires after 1 hour
 
-**Solution :** Refresh token (HttpOnly cookie, 30 jours)
+**Solution:** Refresh token (HttpOnly cookie, 30 days)
 
 ```
 ┌─────────────────────────────────────────┐
-│ User navigue sur la plateforme          │
-│ Access token expire après 1h            │
+│ User navigates the platform             │
+│ Access token expires afte 1h            │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ Frontend Interceptor détecte:           │
-│ - Token expiré (avant envoi)            │
-│ - Ou reçoit 401                         │
+│ Frontend Interceptor detects:           │
+│ - Token expired (before sending)        │
+│ - Or receives 401                       │
 └──────────────┬──────────────────────────┘
                │
-┌──────────────▼──────────────────────────┐
-│ Interceptor appelle automatiquement:    │
-│ POST /api/auth/refresh                  │
-│ (Cookie refresh_token envoyé auto)      │
-└──────────────┬──────────────────────────┘
+┌──────────────▼──────────────────────────-┐
+│ The interceptor automatically calls:     │
+│ POST /api/auth/refresh                   │
+│ (Cookie refresh_token sent automatically)│
+└──────────────┬─────────────────────────-─┘
                │
 ┌──────────────▼──────────────────────────┐
 │ Backend:                                │
