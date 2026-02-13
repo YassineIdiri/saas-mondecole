@@ -86,4 +86,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: monuser/monapp:latest
+          tags: novytris/mondecole:latest
+
