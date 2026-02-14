@@ -1,16 +1,16 @@
-# 🎓 Présentation Détaillée : Plateforme LMS Multi-tenant "Mon École Pocket"
+# 🎓 Detailed Presentation: Multi-tenant LMS Platform "Mondecole"
 
 ---
 
-## 📋 Table des Matières
+## 📋 Table of Contents
 
-1. [Vue d'ensemble du projet](#vue-densemble)
-2. [Architecture technique](#architecture-technique)
-3. [Sécurité & Multi-tenancy](#sécurité--multi-tenancy)
-4. [Workflows utilisateurs](#workflows-utilisateurs)
-5. [Fonctionnalités détaillées](#fonctionnalités-détaillées)
-6. [Points techniques clés](#points-techniques-clés)
-7. [Démonstration des flows](#démonstration-des-flows)
+1. [Project overview](#vue-densemble)
+2. [Technical Architecture](#architecture-technique)
+3. [Security & Multi-tenancy](#sécurité--multi-tenancy)
+4. [User workflows](#workflows-utilisateurs)
+5. [Detailed features](#fonctionnalités-détaillées)
+6. [Key technical points](#points-techniques-clés)
+7. [Flow demonstration](#démonstration-des-flows)
 
 ---
 
@@ -785,39 +785,40 @@ if (progressPercent == 100 && !enrollment.completed) {
 └─────────────────────────────────────────┘
 ```
 
-**Sécurité :**
-- ✅ Refresh token dans HttpOnly cookie (pas accessible en JS)
-- ✅ Rotation du refresh token à chaque usage
-- ✅ Access token court (1h) limite l'exposition
-- ✅ Refresh long (30j) évite les logins fréquents
-
+**Security:**
+- ✅ Refresh token in an HttpOnly cookie (not accessible via JavaScript)
+- ✅ Refresh token rotates with each use
+- ✅ Short access token (1 hour) limits exposure
+- ✅ Long refresh token (30 days) prevents frequent logins
+- 
 #### C. Guards Angular
 
-**Protection des routes :**
+**Road protection:**
 
 ```typescript
-// Route protégée
+// Protected route
 {
   path: 'admin/dashboard',
   component: AdminDashboardComponent,
-  canActivate: [adminGuard]  // ✅ Seuls les admins
+  canActivate: [adminGuard]  // ✅ Only admins
+
 }
 
 // Guard implementation
 export const adminGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   
-  // Pas de token → /login
+  // No token → /login
   if (!authService.getToken()) {
     router.navigate(['/login']);
     return false;
   }
   
-  // Token expiré → Refresh puis retry
+  // Token expired → Refresh then retry
   if (!authService.isLoggedIn()) {
     return authService.refreshToken().pipe(
       map(() => {
-        // Après refresh, vérifier admin
+        // After refreshing, check admin
         if (!authService.isAdmin()) {
           router.navigate(['/home']);
           return false;
@@ -827,7 +828,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
     );
   }
   
-  // Token valide mais pas admin → /home
+// Valid token but not admin → /home
   if (!authService.isAdmin()) {
     router.navigate(['/home']);
     return false;
@@ -839,26 +840,24 @@ export const adminGuard: CanActivateFn = (route, state) => {
 
 ---
 
-### 2. Gestion des cours (Teacher)
+### 2. Course Management (Teacher)
 
-#### A. CRUD Complet
+#### A. Complete CRUD
 
 **Create :**
 ```
-POST /api/courses
 Body: {
-  title: "Python pour débutants",
-  summary: "Apprenez Python...",
-  description: "Ce cours complet...",
+  title: "Python for Beginners",
+  summary: "Learn Python...",
+  description: "This comprehensive course...",
   category: "Programming",
   level: "BEGINNER",
-  estimatedHours: 20,
-  objectives: "- Écrire des programmes...",
-  prerequisites: "Aucun"
+  estimated Hours: 20,
+  objectives: "- Write programs...",
+  prerequisites: "None"
 }
-
 Backend:
-- Génère slug: "python-pour-debutants"
+- Generates slug: "python-for-beginners"
 - Set organization_id depuis TenantContext
 - Set author_id depuis JWT
 - published = false (draft)
@@ -879,13 +878,13 @@ Backend:
 ```
 PUT /api/courses/5
 Body: {
-  title: "Python pour débutants (mise à jour)"
+  title: "Python for Beginners (Update)"
 }
 
 Backend:
 - WHERE id = 5 
 - AND organization_id = 1
-- AND author_id = 42  // ✅ Vérification ownership
+- AND author_id = 42  // ✅ Ownership verification
 ```
 
 **Delete :**
@@ -918,12 +917,12 @@ public CourseDetailResponse publishCourse(Long courseId, Long authorId) {
 }
 ```
 
-**Impact :**
-- ✅ Le cours apparaît dans le catalogue étudiant
-- ✅ Les étudiants peuvent s'inscrire
-- ✅ Les stats "Total students" commencent à compter
+**Impact:**
+- ✅ The course appears in the student catalog
+- ✅ Students can enroll
+- ✅ The "Total students" statistics start being counted
 
-**Published → Unpublished :**
+**Published → Unpublished:**
 
 ```java
 @Transactional
@@ -937,16 +936,16 @@ public CourseDetailResponse unpublishCourse(Long courseId, Long authorId) {
 }
 ```
 
-**Impact :**
-- ❌ Le cours disparaît du catalogue
-- ✅ Les étudiants déjà inscrits peuvent continuer
-- ℹ️ Nouvelles inscriptions bloquées
+**Impact:**
+- ❌ The course is removed from the catalog
+- ✅ Students already enrolled can continue
+- ℹ️ New enrollments are blocked
 
 ---
 
-### 3. Inscription & Progression (Student)
+### 3. Registration & Progress (Student)
 
-#### A. Enrollment (Inscription)
+#### A. Enrollment (Registration)
 
 **Workflow complet :**
 
@@ -957,22 +956,22 @@ public CourseDetailResponse unpublishCourse(Long courseId, Long authorId) {
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 2. Student clique sur un cours          │
+│ 2. Student clicks on a course           │
 │    GET /api/student/courses/5           │
 │                                         │
-│    Backend retourne:                    │
+│    Backend returns::                    │
 │    - Course details                     │
 │    - Sections & Lessons                 │
-│    - enrollment: null (pas inscrit)     │
+│    - enrollment: null (not registered)  │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 3. Student clique "Enroll Now"          │
+│ 3. Student click "Enroll Now"           │
 │    POST /api/student/courses/5/enroll   │
 └──────────────┬──────────────────────────┘
                │
 ┌──────────────▼──────────────────────────┐
-│ 4. Backend crée:                        │
+│ 4. Backend created:                     │
 │    CourseEnrollment {                   │
 │      organizationId: 1,                 │
 │      studentId: 42,                     │
@@ -1003,11 +1002,11 @@ public CourseDetailResponse unpublishCourse(Long courseId, Long authorId) {
 **Auto-tracking (VIDEO) :**
 
 ```javascript
-// Dans le player vidéo
+// In the video player
 videoPlayer.on('timeupdate', () => {
   const progress = (currentTime / duration) * 100;
   
-  // Sauvegarder toutes les 10 secondes
+// Save every 10 seconds
   if (Date.now() - lastSave > 10000) {
     studentCourseService.updateLessonProgress(lessonId, {
       progressPercent: Math.floor(progress),
@@ -1022,7 +1021,7 @@ videoPlayer.on('timeupdate', () => {
 **Auto-tracking (TEXT) :**
 
 ```javascript
-// Incrémentation progressive
+// Progressive increment
 interval(10000).subscribe(() => {
   if (currentProgress < 90) {
     updateProgress(currentProgress + 10);
@@ -1666,122 +1665,121 @@ Jour 12 : 5 leçons complétées → 100% progress
 ```
 
 ---
+## 💡 Ideas for Future Improvements
 
-## 💡 Idées d'Améliorations Futures
+### Short Term (1-2 weeks)
 
-### Court terme (1-2 semaines)
+1. **PDF Certificates**
+- 100% Automatic Generation
+- Customizable Template for Organizations
+- QR Verification Code
 
-1. **Certificates PDF**
-   - Génération automatique à 100%
-   - Template personnalisable par organisation
-   - QR code de vérification
+2. **Interactive Quiz**
+- Multiple Choice Questions
+- Automatic Scoring
+- Minimum 70% Passing Score
 
-2. **Quiz interactif**
-   - Questions à choix multiples
-   - Scoring automatique
-   - Minimum 70% pour valider
+3. **Assignments**
+- Student File Uploads
+- Instructor Grading
+- Grades and Comments
 
-3. **Assignments (devoirs)**
-   - Upload de fichiers par les étudiants
-   - Correction par le professeur
-   - Notes et commentaires
+4. **Advanced Search & Filters**
+- Full-Text Search in the Catalog
+- Filters: Category, Level, Duration
+- Sorting: Popularity, Date, Grade
 
-4. **Search & Filters avancés**
-   - Recherche full-text dans le catalogue
-   - Filtres : catégorie, niveau, durée
-   - Tri : popularité, date, note
+### Medium Term (1-2 months)
 
-### Moyen terme (1-2 mois)
-
-5. **Discussions par cours**
-   - Forum Q&A par cours
-   - Réponses du professeur
-   - Upvote des meilleures réponses
+5. **Course Discussions**
+- Course Q&A Forum
+- Instructor Answers
+- Upvoting of Top Answers
 
 6. **Notifications**
-   - Email : nouveau cours disponible
-   - Push : rappel de cours non terminés
-   - Digest hebdomadaire de progression
+- Email: New Course Available
+- Push Notifications: Reminders for Incomplete Courses
+- Weekly Digest Progress
 
-7. **Analytics avancés**
-   - Dashboard professeur : taux de complétion, temps moyen
-   - Dashboard admin : engagement, retention
-   - Heatmaps de progression
+7. **Advanced Analytics**
+- Teacher Dashboard: Completion Rate, Average Time
+- Admin Dashboard: Engagement, Retention
+- Progress Heatmaps
 
-8. **Video hosting**
-   - Upload direct de vidéos
-   - Conversion automatique
-   - Streaming optimisé
+8. **Video Hosting**
+- Direct Video Upload
+- Automatic Conversion
+- Optimized Streaming
 
-### Long terme (3-6 mois)
+### Long Term (3-6 months)
 
-9. **Live classes**
-   - Visioconférence intégrée
-   - Scheduling de sessions live
-   - Recording automatique
+9. **Live Classes**
+- Integrated Video Conferencing
+- Live Session Scheduling
+- Automatic Recording
 
 10. **Gamification**
-    - Points par leçon complétée
-    - Badges et achievements
-    - Leaderboards
+- Points per Completed Lesson
+- Badges and Achievements
+- Leaderboards
 
-11. **Mobile apps**
-    - iOS et Android natifs
-    - Offline mode
-    - Push notifications
+11. **Mobile Apps**
+- Native iOS and Android
+- Offline Mode
+- Push Notifications
 
-12. **API publique**
-    - Webhooks pour intégrations
-    - OAuth pour apps tierces
-    - Documentation Swagger
+12. **Public API**
+- Webhooks for Integrations
+- OAuth for Third-Party Apps
+- Swagger Documentation
 
 ---
 
-## ✅ Conclusion
+### What Has Been Accomplished
 
-### Ce qui a été accompli
+**Backend (Spring Boot):**
 
-**Backend (Spring Boot) :**
-- ✅ Architecture multi-tenant complète
-- ✅ Authentification JWT sécurisée
-- ✅ Gestion des utilisateurs (CRUD)
-- ✅ Gestion des cours (CRUD)
-- ✅ Système d'enrollment
-- ✅ Tracking de progression
-- ✅ 10 migrations de base de données
-- ✅ Isolation totale entre organisations
+- ✅ Complete multi-tenant architecture
+- ✅ Secure JWT authentication
+- ✅ User management (CRUD)
+- ✅ Course management (CRUD)
+- ✅ Enrollment system
+- ✅ Progress tracking
+- ✅ 10 database migrations
+- ✅ Complete isolation between organizations
 
-**Frontend (Angular) :**
-- ✅ Interface admin (dashboard, users management)
-- ✅ Interface professeur (course creation, management)
-- ✅ Interface étudiant (catalog, enrollment, learning)
-- ✅ Player de contenu (video, text, document)
-- ✅ Tracking de progression en temps réel
-- ✅ Navigation fluide entre leçons
-- ✅ Design moderne avec Tailwind CSS
+**Frontend (Angular):**
+- ✅ Admin interface (dashboard, user management)
+- ✅ Instructor interface (course creation, management)
+- ✅ Student interface (catalog, enrollment, learning)
+- ✅ Content player (video, text, document)
+- ✅ Real-time progress tracking
+- ✅ Seamless navigation between lessons
+- ✅ Modern design with Tailwind CSS
 
-**Sécurité :**
-- ✅ Multi-tenant isolation (impossible de voir les données d'autres organisations)
+**Security:**
+- ✅ Multi-tenant isolation (unable to view data from other organizations)
 - ✅ Role-based access control (ADMIN, TEACHER, STUDENT)
-- ✅ JWT avec refresh token
-- ✅ HttpOnly cookies pour refresh token
-- ✅ Guards Angular pour protection des routes
+- ✅ JWT with refresh token
+- ✅ HttpOnly cookies for refresh token
+- ✅ Angular Guards for route protection
 
-### Métriques du projet
+### Project Metrics
 
-**Lignes de code :**
-- Backend : ~5,000 lignes (Java)
-- Frontend : ~3,500 lignes (TypeScript/HTML)
-- Total : ~8,500 lignes
+**Lines of Code:**
 
-**Fichiers créés :**
-- Backend : ~40 fichiers
-- Frontend : ~25 fichiers
-- Migrations SQL : 10 fichiers
+- Backend: ~5,000 lines (Java)
+- Frontend: ~3,500 lines (TypeScript/HTML)
+- Total: ~8,500 lines
 
-**Endpoints API :**
-- Auth : 4 endpoints
-- Admin : 6 endpoints
-- Teacher : 7 endpoints
-- Student : 7 endpoints
-- Total : 24 endpoints REST
+**Files Created:**
+- Backend: ~40 files
+- Frontend: ~25 files
+- SQL Migrations: 10 files
+
+**API Endpoints:**
+- Auth: 4 endpoints
+- Admin: 6 endpoints
+- Teacher: 7 endpoints
+- Student: 7 endpoints
+- Total: 24 REST endpoints
