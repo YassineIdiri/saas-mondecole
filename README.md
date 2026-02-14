@@ -4,13 +4,13 @@
 
 ## 📋 Table of Contents
 
-1. [Project overview](#vue-densemble)
-2. [Technical Architecture](#architecture-technique)
-3. [Security & Multi-tenancy](#sécurité--multi-tenancy)
-4. [User workflows](#workflows-utilisateurs)
-5. [Detailed features](#fonctionnalités-détaillées)
-6. [Key technical points](#points-techniques-clés)
-7. [Flow demonstration](#démonstration-des-flows)
+1. [Project overview](#overview)
+2. [Technical Architecture](#architecture-technology)
+3. [Security & Multi-tenancy](#security--multi-tenancy)
+4. [User workflows](#user workflows)
+5. [Detailed features](#detailed features)
+6. [Key technical points](#key-technical points)
+7. [Flow demonstration](#flow demonstration)
 
 ---
 
