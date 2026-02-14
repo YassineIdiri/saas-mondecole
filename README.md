@@ -1079,10 +1079,9 @@ private void updateCourseProgress(Long studentId, Long courseId) {
     save(enrollment);
 }
 ```
+#### C. Navigation between lessons
 
-#### C. Navigation entre leçons
-
-**Backend calcule automatiquement :**
+**Backend automatically calculates:**
 
 ```java
 public LessonContent getLessonContent(Long lessonId, Long studentId) {
@@ -1115,7 +1114,7 @@ public LessonContent getLessonContent(Long lessonId, Long studentId) {
 }
 ```
 
-**Frontend utilise :**
+**Frontend uses:**
 
 ```html
 <!-- Previous button -->
@@ -1140,27 +1139,27 @@ public LessonContent getLessonContent(Long lessonId, Long studentId) {
 
 ---
 
-## 🔧 Points Techniques Clés
+## 🔧 Key Technical Points
 
-### 1. Isolation Multi-tenant
+### 1. Multi-tenant Isolation
 
-**Niveau 1 : Base de données**
+**Level 1: Database**
 
-Chaque table a `organization_id` :
+Each table has an `organization_id`:
 
 ```sql
--- TOUTES les requêtes incluent organization_id
+-- ALL queries include organization_id
 SELECT * FROM courses 
 WHERE organization_id = 1 
 AND published = true;
 
--- Les Foreign Keys garantissent l'intégrité
+-- The Foreign Keys guarantee the integrity
 CONSTRAINT fk_course_organization 
     FOREIGN KEY (organization_id) 
     REFERENCES organizations (id)
 ```
 
-**Niveau 2 : Application (TenantFilter)**
+**Level 2: Application (TenantFilter)**
 
 ```java
 @Component
@@ -1202,17 +1201,17 @@ public class TenantContext {
 }
 ```
 
-**Niveau 3 : Service Layer**
+**Level 3: Service Layer**
 
 ```java
 @Service
 public class CourseService {
     
     public Page<Course> getMyCourses(...) {
-        // ✅ Toujours récupérer orgId depuis TenantContext
+        // ✅ Always retrieve orgId from TenantContext
         Long organizationId = TenantContext.getTenantId();
         
-        // ✅ TOUTES les requêtes incluent organization_id
+        // ✅ ALL requests include organization_id
         return courseRepository.findByOrganizationIdAndAuthorId(
             organizationId, authorId, pageable
         );
@@ -1220,43 +1219,43 @@ public class CourseService {
 }
 ```
 
-**Résultat :**
-- ✅ Impossible d'accéder aux données d'une autre organisation
-- ✅ Même si on force l'ID dans l'URL
-- ✅ Même si on modifie le JWT (signature invalide)
+**Result:**
+- ✅ Unable to access another organization's data
+- ✅ Even if the ID is forced in the URL
+- ✅ Even if the JWT is modified (invalid signature)
 
 ---
 
-### 2. Architecture Frontend (Zoneless Angular)
+### 2. Frontend Architecture (Zoneless Angular)
 
-**Pourquoi Zoneless ?**
+**Why Zoneless?**
 
-Angular classique utilise Zone.js pour détecter les changements :
+Classic Angular uses Zone.js to detect changes:
 
 ```typescript
-// Avec Zone.js (classique)
+// With Zone.js (classic)
 button.addEventListener('click', () => {
-  this.counter++;  // Zone.js détecte et déclenche change detection
+  this.counter++;  // Zone.js detects and triggers change detection
 });
 ```
 
-**Problème :** Performance overhead, bugs subtils
+**Problem:** Performance overhead, subtle bugs
 
-**Solution : Zoneless (Angular 18)**
+**Solution: Zoneless (Angular 18)**
 
 ```typescript
-// Sans Zone.js (zoneless)
+// Without Zone.js (zoneless)
 import { ChangeDetectorRef } from '@angular/core';
 
 constructor(private cdr: ChangeDetectorRef) {}
 
 button.addEventListener('click', () => {
   this.counter++;
-  this.cdr.markForCheck();  // ✅ Explicite
+  this.cdr.markForCheck();  // ✅ Explicit
 });
 ```
 
-**Notre helper `ui(cdr)` :**
+**Our `ui(cdr)` helper:**
 
 ```typescript
 // ui.helper.ts
@@ -1293,16 +1292,16 @@ loadCourses() {
 }
 ```
 
-**Avantages :**
-- ✅ Performance accrue (pas de Zone.js)
-- ✅ Change detection explicite et contrôlée
-- ✅ Pas de bugs liés à Zone.js
+**Advantages:**
+- ✅ Increased performance (no Zone.js)
+- ✅ Explicit and controlled change detection
+- ✅ No Zone.js-related bugs
 
 ---
 
-### 3. SSR (Server-Side Rendering) Compatibility
+### 3. Server-Side Rendering (SSR) Compatibility
 
-**Problème :** Angular peut faire du rendu côté serveur (SSR) où `localStorage` n'existe pas.
+**Problem:** Angular can perform server-side rendering (SSR) where `localStorage` does not exist.
 
 **Solution :**
 
@@ -1345,13 +1344,13 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 ### 4. HTTP Interceptor (Token Management)
 
-**Rôles de l'intercepteur :**
+**Interceptor Roles:**
 
-1. **Ajouter automatiquement le JWT**
-2. **Ajouter automatiquement X-Organization-Id**
-3. **Gérer le refresh automatique**
-4. **Retry sur 401**
-
+1. **Automatically add the JWT**
+2. **Automatically add the X-Organization-Id**
+3. **Manage automatic refresh**
+4. **Retry on 401**
+   
 ```typescript
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenStore = inject(TokenStore);
@@ -1408,14 +1407,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 ### 5. Slugification
 
-**Pourquoi slugifier ?**
+**Why slugify?**
 
-Les titres de cours contiennent souvent des caractères spéciaux :
+Course titles often contain special characters:
 
-- "Introduction à Python" → URL illisible
-- Espaces, accents, caractères spéciaux
+- "Introduction to Python" → Unreadable URL
+- Spaces, accents, special characters
 
-**Solution :**
+**Solution:**
 
 ```java
 private String slugify(String text) {
@@ -1430,7 +1429,7 @@ private String slugify(String text) {
         .replaceAll("^-+|-+$", "");
 }
 
-// "Introduction à Python" → "introduction-a-python"
+// "Introduction to Python" → "introduction-a-python"
 ```
 
 **Unicité garantie :**
@@ -1452,13 +1451,13 @@ private String generateUniqueSlug(String title, Long orgId) {
 
 ---
 
-## 🎬 Démonstration des Flows
+## 🎬 Flows Demonstration
 
-### Scénario Complet : De la création d'organisation à la certification
+### Complete Scenario: From Organization Creation to Certification
 
-#### Jour 1 : Setup
+#### Day 1: Setup
 
-**09:00 - Admin crée l'organisation**
+**9:00 AM - Admin Creates Organization**
 
 ```
 1. Visite /organization/register
@@ -1466,39 +1465,39 @@ private String generateUniqueSlug(String title, Long orgId) {
    - Name: "École de Code Strasbourg"
    - Slug: "ecole-code-67"
    - Admin: "admin@ecole67.fr" / "admin" / "password123"
-3. Soumission
-4. Backend crée :
+3. Submission
+4. Backend created:
    ✅ Organization (id: 1)
    ✅ Admin user (id: 1, organization_id: 1, role: ADMIN)
 5. Redirect /login
 ```
 
-**09:05 - Admin se connecte**
+**09:05 - Admin logs in**
 
 ```
-1. Login avec "admin" / "password123"
+1. Log in with "admin" / "password123"
 2. Backend :
-   - Lookup organization_id pour "admin" → 1
-   - Génère JWT avec organizationId: 1, role: ADMIN
+  - Lookup organization_id for "admin" → 1
+  - Generates JWT with organizationId: 1, role: ADMIN
 3. Redirect /admin/dashboard
 ```
 
-**09:10 - Admin invite un professeur**
+**09:10 - Admin invites a teacher**
 
 ```
-1. Dashboard admin → Génère lien d'invitation
-2. Copie lien : https://app.com/join?token=abc123
-3. Envoie email à jean.dupont@ecole67.fr
+1. Admin dashboard → Generate invitation link
+2. Copy link: https://app.com/join?token=abc123
+3. Send email to jean.dupont@ecole67.fr
 ```
 
 **09:30 - Jean rejoint l'organisation**
 
 ```
-1. Jean clique sur le lien
-2. Page /join affiche :
+1. Jean clicks on the link.
+2. The /join page displays:
    "Join École de Code Strasbourg"
-   Email: jean.dupont@ecole67.fr (pré-rempli)
-3. Jean choisit :
+   Email: jean.dupont@ecole67.fr (pre-filled)
+3. Jean chooses:
    Username: "jdupont"
    Password: "******"
    Role: TEACHER
@@ -1507,91 +1506,92 @@ private String generateUniqueSlug(String title, Long orgId) {
 5. Redirect /login
 ```
 
-#### Jour 2 : Création de cours
+#### Day 2: Creating a Course
 
-**10:00 - Jean crée un cours**
+**10:00 - Jean creates a course**
 
 ```
-1. Login "jdupont" → Redirect /teacher/courses
-2. Clique "Create Course"
-3. Remplit formulaire :
-   - Title: "Python pour débutants"
-   - Summary: "Apprenez Python de zéro"
+1. Login “jdupont” → Redirect /teacher/courses
+2. Click “Create Course”
+3. Complete the form:
+   - Title: "Python for Beginners"
+   - Summary: "Learn Python from scratch"
    - Category: "Programming"
    - Level: "BEGINNER"
    - Estimated Hours: 20
-   - Description: "Ce cours complet vous apprendra..."
-   - Objectives: "- Écrire des programmes Python..."
-   - Prerequisites: "Aucun prérequis"
-4. Soumission
-5. Backend crée :
+   - Description: "This comprehensive course will teach you..."
+   - Objectives: "- Write Python programs..."
+   - Prerequisites: "None"
+4. Submission
+5. Backend created:
    ✅ Course (id: 1, organization_id: 1, author_id: 2, published: false)
-   ✅ Slug: "python-pour-debutants"
-6. Jean voit son cours en "Draft"
+   ✅ Slug: "python-for-beginners"
+6. Jean sees his course as a "Draft"
 ```
 
-**10:30 - Jean publie le cours**
+**10:30 - Jean publishes the course**
 
 ```
-1. Jean clique "Publish"
-2. Backend :
+1. Jean clicks "Publish"
+2. Backend:
    Course.published = true
    Course.publishedAt = NOW()
-3. ✅ Cours maintenant visible dans le catalogue étudiant
+3. ✅ Course now visible in the student catalog
 ```
 
-#### Jour 3 : Étudiant s'inscrit
+#### Day 3: Student registers
 
-**14:00 - Admin invite un étudiant**
+**2:00 PM - Admin invites a student**
 
 ```
-1. Admin génère lien → marie.martin@gmail.com
-2. Marie rejoint :
+1. Admin generates link → marie.martin@gmail.com
+2. Marie joins:
    Username: "mmartin"
    Password: "******"
    Role: STUDENT
-3. Backend crée :
-   ✅ User (id: 3, organization_id: 1, role: STUDENT)
+3. Backend creates:
+
+✅ User (id: 3, organization_id: 1, role: STUDENT)
 ```
 
-**14:15 - Marie découvre le catalogue**
+**14:15 - Marie discovers the catalog**
 
 ```
-1. Login "mmartin" → Redirect /student/dashboard
-2. Dashboard vide (pas encore de cours)
-3. Clique "Browse Catalog"
-4. Voit :
+1. Log in "mmartin" → Redirect /student/dashboard
+2. Empty dashboard (no courses yet)
+3. Click "Browse Catalog"
+4. View:
    ┌────────────────────────────┐
-   │ 📘 Python pour débutants   │
+   │ 📘 Python for beginners    │
    │ BEGINNER | Programming     │
-   │ 20h | 0 students            │
+   │ 20h | 0 students           │
    │ [ENROLL NOW]               │
    └────────────────────────────┘
 ```
 
-**14:20 - Marie s'inscrit au cours**
+**2:20 PM - Marie signs up for the course**
 
 ```
-1. Clique sur le cours → Page détail
-2. Voit curriculum :
-   1. Introduction (0/3 lessons)
-   2. Variables (0/5 lessons)
-   ...
-3. Clique "Enroll Now"
-4. Backend crée :
-   ✅ CourseEnrollment (id: 1, student_id: 3, course_id: 1, progress: 0%)
-5. Page rafraîchie :
-   ❌ "Enroll Now" disparaît
-   ✅ "Start Learning" apparaît
-   ✅ Progress bar 0%
+1. Click on the course → Details page
+2. View curriculum:
+  1. Introduction (0-3 lessons)
+  2. Variables (0-5 lessons)
+  ...
+3. Click "Enroll Now"
+4. Backend created:
+  ✅ CourseEnrollment (id: 1, student_id: 3, course_id: 1, progress: 0%)
+5. Page refreshed:
+  ❌ "Enroll Now" disappears
+  ✅ "Start Learning" appears
+  ✅ Progress bar 0%
 ```
 
-**14:25 - Marie commence le cours**
+**2:25 PM - Marie begins the lesson**
 
 ```
-1. Clique "Start Learning"
-2. Redirect /student/lessons/1 (première leçon)
-3. Voit :
+1. Click "Start Learning"
+2. Redirect /student/lessons/1 (first lesson)
+3. View:
    ┌─────────────────────────────────┐
    │ 🎥 What is Python?              │
    │ [VIDEO PLAYER]                  │
@@ -1607,57 +1607,56 @@ private String generateUniqueSlug(String title, Long orgId) {
 **14:30 - Marie regarde la vidéo**
 
 ```
-1. Play vidéo
-2. Pendant la lecture :
-   - Toutes les 10 secondes :
-     Backend reçoit :
-     progressPercent: 20 (puis 40, 60, 80)
-     lastPositionSeconds: 60 (puis 120, 180, 240)
-3. À 95% de la vidéo :
-   Backend marque :
-   LessonProgress.completed = true
-   LessonProgress.completedAt = NOW()
-4. UI affiche :
-   ✅ "Lesson Completed!"
-   Progress: 100%
+1. Play video
+2. During playback:
+  - Every 10 seconds:
+    Backend receives:
+    progressPercent: 20 (then 40, 60, 80)
+    lastPositionSeconds: 60 (then 120, 180, 240)
+3. At 95% of the video:
+    Backend sets:
+    LessonProgress.completed = true
+    LessonProgress.completedAt = NOW()
+4. UI displays:
+    ✅ "Lesson Completed!"
+    Progress: 100%
 ```
 
-**14:35 - Marie navigue vers la leçon suivante**
+**14:35 - Marie navigates to the next lesson**
 
 ```
-1. Clique "Next Lesson"
-2. Backend met à jour :
-   CourseEnrollment.progressPercent = 4%  (1/25 leçons)
-3. Marie sur leçon 2 : "Setup Environment"
+1. Click "Next Lesson"
+2. Backend updates:
+   CourseEnrollment.progressPercent = 4% (1/25 lessons)
+3. Marie on Lesson 2: "Setup Environment"
 ```
 
-#### Semaine suivante : Progression
+#### Next Week: Progress
 
-**Marie continue le cours sur plusieurs jours :**
-
-```
-Jour 4 : 5 leçons complétées → 20% progress
-Jour 5 : 3 leçons complétées → 32% progress
-Jour 8 : 7 leçons complétées → 60% progress
-Jour 10 : 5 leçons complétées → 80% progress
-Jour 12 : 5 leçons complétées → 100% progress
-```
-
-**Jour 12 - Complétion du cours**
+**Marie continues the course over several days:**
 
 ```
-1. Marie complète la dernière leçon
-2. Backend détecte :
-   completedLessons = 25
-   totalLessons = 25
-   progressPercent = 100
-3. Backend met à jour :
+Day 4: 5 lessons completed → 20% progress
+Day 5: 3 lessons completed → 32% progress
+Day 8: 7 lessons completed → 60% progress
+Day 10: 5 lessons completed → 80% progress
+Day 12: 5 lessons completed → 100% progress
+```
+
+**Day 12 - Course Completion**
+
+```
+1. Marie completes the last lesson.
+2. Backend detects:
+    completedLessons = 25
+    totalLessons = 25
+    progressPercent = 100
+3. Backend updates:
    CourseEnrollment.completed = true
    CourseEnrollment.completedAt = NOW()
-   
    🎉 Génération du certificat (à venir)
 4. Dashboard Marie :
-   📊 Stats mises à jour :
+   📊 Updated stats:
    - Enrolled: 1
    - Completed: 1 ✅
    - In Progress: 0
