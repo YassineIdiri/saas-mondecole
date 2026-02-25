@@ -28,11 +28,3 @@ CREATE TABLE refresh_tokens (
     CONSTRAINT fk_refresh_organization FOREIGN KEY (organization_id)
         REFERENCES organizations (id) ON DELETE CASCADE
 );
-
--- Indexes
-CREATE UNIQUE INDEX uk_refresh_token_hash ON refresh_tokens (token_hash);
-CREATE INDEX idx_refresh_token_hash ON refresh_tokens (token_hash);
-CREATE INDEX idx_refresh_user_id ON refresh_tokens (user_id);
-CREATE INDEX idx_refresh_org_id ON refresh_tokens (organization_id);
-CREATE INDEX idx_refresh_expires ON refresh_tokens (expires_at);
-CREATE INDEX idx_refresh_revoked ON refresh_tokens (revoked);

@@ -36,8 +36,3 @@ CREATE TABLE organizations (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
-
--- Indexes
-CREATE INDEX idx_org_slug ON organizations (slug);
-CREATE INDEX idx_org_invitation_code ON organizations (invitation_code);
-CREATE INDEX idx_org_active ON organizations (active);

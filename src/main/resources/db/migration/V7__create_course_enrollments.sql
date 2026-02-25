@@ -36,9 +36,3 @@ CREATE TABLE course_enrollments (
     -- Unique constraint
     CONSTRAINT uk_enrollment_student_course UNIQUE (student_id, course_id)
 );
-
--- Indexes
-CREATE INDEX idx_enrollment_org_id ON course_enrollments (organization_id);
-CREATE INDEX idx_enrollment_student ON course_enrollments (student_id);
-CREATE INDEX idx_enrollment_course ON course_enrollments (course_id);
-CREATE INDEX idx_enrollment_completed ON course_enrollments (completed);

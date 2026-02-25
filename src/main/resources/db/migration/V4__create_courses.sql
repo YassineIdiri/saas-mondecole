@@ -44,10 +44,3 @@ CREATE TABLE courses (
     CONSTRAINT fk_course_author FOREIGN KEY (author_id)
         REFERENCES users (id) ON DELETE CASCADE
 );
-
--- Indexes
-CREATE INDEX idx_course_org_id ON courses (organization_id);
-CREATE INDEX idx_course_author ON courses (author_id);
-CREATE INDEX idx_course_category ON courses (category);
-CREATE INDEX idx_course_published ON courses (published);
-CREATE INDEX idx_course_slug ON courses (slug);

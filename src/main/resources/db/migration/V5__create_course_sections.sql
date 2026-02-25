@@ -22,8 +22,3 @@ CREATE TABLE course_sections (
     CONSTRAINT fk_section_course FOREIGN KEY (course_id)
         REFERENCES courses (id) ON DELETE CASCADE
 );
-
--- Indexes
-CREATE INDEX idx_section_org_id ON course_sections (organization_id);
-CREATE INDEX idx_section_course ON course_sections (course_id);
-CREATE INDEX idx_section_order ON course_sections (order_index);

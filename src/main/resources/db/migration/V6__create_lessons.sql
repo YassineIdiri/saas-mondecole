@@ -42,9 +42,3 @@ CREATE TABLE lessons (
     CONSTRAINT fk_lesson_section FOREIGN KEY (section_id)
         REFERENCES course_sections (id) ON DELETE CASCADE
 );
-
--- Indexes
-CREATE INDEX idx_lesson_org_id ON lessons (organization_id);
-CREATE INDEX idx_lesson_section ON lessons (section_id);
-CREATE INDEX idx_lesson_order ON lessons (order_index);
-CREATE INDEX idx_lesson_type ON lessons (type);

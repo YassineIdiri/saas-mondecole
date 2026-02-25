@@ -36,9 +36,3 @@ CREATE INDEX idx_user_org_id ON users (organization_id);
 CREATE INDEX idx_user_email ON users (email);
 CREATE INDEX idx_user_role ON users (role);
 CREATE INDEX idx_user_active ON users (active);
-
--- Unique constraint: username unique per organization
-CREATE UNIQUE INDEX uk_user_org_username ON users (organization_id, username);
-
--- Optional: email unique per organization (if needed)
-CREATE INDEX idx_user_org_email ON users (organization_id, email);

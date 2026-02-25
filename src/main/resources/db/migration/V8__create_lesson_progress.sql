@@ -33,9 +33,3 @@ CREATE TABLE lesson_progress (
     -- Unique constraint
     CONSTRAINT uk_progress_student_lesson UNIQUE (student_id, lesson_id)
 );
-
--- Indexes
-CREATE INDEX idx_progress_org_id ON lesson_progress (organization_id);
-CREATE INDEX idx_progress_student ON lesson_progress (student_id);
-CREATE INDEX idx_progress_lesson ON lesson_progress (lesson_id);
-CREATE INDEX idx_progress_completed ON lesson_progress (completed);
