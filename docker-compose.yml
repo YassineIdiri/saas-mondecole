@@ -36,8 +36,28 @@ services:
       postgres:
         condition: service_healthy
 
+  redis:
+    image: redis:7-alpine
+    container_name: base-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - base-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+
 volumes:
   postgres-data:
+    driver: local
+  redis-data:
     driver: local
 
 networks:
