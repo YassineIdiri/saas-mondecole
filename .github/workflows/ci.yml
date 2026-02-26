@@ -88,3 +88,18 @@ jobs:
           push: true
           tags: novytris/mondecole:latest
 
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [ docker ]
+    steps:
+      - name: SSH & Deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~
+            docker-compose pull
+            docker-compose up -d
