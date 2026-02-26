@@ -1,4 +1,4 @@
-package com.example.jwt_authenticator.exception;
+package com.example.mondecole_pocket.exception;
 
 import java.time.LocalDateTime;
 

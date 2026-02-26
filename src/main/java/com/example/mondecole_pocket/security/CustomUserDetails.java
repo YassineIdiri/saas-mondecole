@@ -1,7 +1,7 @@
-package com.example.jwt_authenticator.security;
+package com.example.mondecole_pocket.security;
 
-import com.example.jwt_authenticator.dto.Role;
-import lombok.RequiredArgsConstructor;
+import com.example.mondecole_pocket.entity.enums.UserRole;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,23 +9,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-
-//Dif entre implement et extend
-@RequiredArgsConstructor
+@Getter
 public class CustomUserDetails implements UserDetails {
-    private final Long userId;
+
+    private final Long id;
+    private final Long organizationId;  // ✅ AJOUT
     private final String username;
-    private final String passwordHash;
+    private final String password;
     private final boolean active;
     private final boolean locked;
-    private final Role role;
+    private final UserRole role;
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public Role getRole() {
-        return role;
+    public CustomUserDetails(Long id, Long organizationId, String username,
+                             String password, boolean active, boolean locked, UserRole role) {
+        this.id = id;
+        this.organizationId = organizationId;  // ✅ AJOUT
+        this.username = username;
+        this.password = password;
+        this.active = active;
+        this.locked = locked;
+        this.role = role;
     }
 
     @Override
@@ -34,18 +37,8 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return passwordHash;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
     public boolean isAccountNonExpired() {
-        return true; // à adapter si besoin
+        return true;
     }
 
     @Override

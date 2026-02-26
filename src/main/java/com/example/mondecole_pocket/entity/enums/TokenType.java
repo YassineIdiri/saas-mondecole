@@ -1,4 +1,4 @@
-package com.example.jwt_authenticator.dto;
+package com.example.mondecole_pocket.entity.enums;
 
 public enum TokenType {
     REFRESH,

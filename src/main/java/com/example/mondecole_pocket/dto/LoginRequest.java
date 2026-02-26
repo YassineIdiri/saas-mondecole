@@ -1,4 +1,4 @@
-package com.example.jwt_authenticator.dto;
+package com.example.mondecole_pocket.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -18,7 +18,8 @@ public record LoginRequest(
         )
         String password,
 
-        Boolean rememberMe
+        Boolean rememberMe,
+        String invitationCode
 ) {
     public boolean isRememberMe() {
         return rememberMe != null && rememberMe;

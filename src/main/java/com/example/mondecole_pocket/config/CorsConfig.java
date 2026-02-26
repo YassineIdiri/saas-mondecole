@@ -1,4 +1,4 @@
-package com.example.jwt_authenticator.config;
+package com.example.mondecole_pocket.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +37,7 @@ public class CorsConfig {
                 "Accept",
                 "Origin",
                 "X-Requested-With",
+                "X-Organization-Id",
                 "Access-Control-Request-Method",
                 "Access-Control-Request-Headers"
         ));
@@ -44,6 +45,7 @@ public class CorsConfig {
         config.setExposedHeaders(List.of(
                 "Authorization",
                 "Set-Cookie",
+                "X-Organization-Id",
                 "Content-Disposition"
         ));
 
