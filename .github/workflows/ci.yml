@@ -68,9 +68,9 @@ jobs:
         run: npm run test
 
   docker:
-    name: Build & Push Docker image
+    name: Build & Push Docker images
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: [ backend, frontend ]
 
     steps:
       - uses: actions/checkout@v4
@@ -81,12 +81,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push
+      # Image backend (ce qui existait déjà)
+      - name: Build and push Backend
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: novytris/mondecole:latest
+          tags: novytris/mondecole-backend:latest
+
+      # Image frontend (nouveau)
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: novytris/mondecole-frontend:latest
 
   deploy:
     name: Deploy to EC2

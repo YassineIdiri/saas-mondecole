@@ -1,0 +1,83 @@
+<nav class="bg-white shadow-md px-6 py-3 flex items-center justify-between">
+
+  <!-- Logo -->
+  <a routerLink="/home" class="text-xl font-bold text-blue-600">
+    MonApp
+  </a>
+
+  <!-- Menu selon le rôle -->
+  <div class="flex items-center gap-6">
+
+    <!-- ✅ ADMIN -->
+    <ng-container *ngIf="authService.isAdmin()">
+      <a routerLink="/admin/dashboard"
+         routerLinkActive="text-blue-600 font-semibold"
+         class="text-gray-600 hover:text-blue-600">
+        Dashboard Admin
+      </a>
+    </ng-container>
+
+    <!-- ✅ TEACHER -->
+    <ng-container *ngIf="authService.isTeacher() || authService.isAdmin()">
+      <a routerLink="/teacher/courses"
+         routerLinkActive="text-blue-600 font-semibold"
+         class="text-gray-600 hover:text-blue-600">
+        Mes cours
+      </a>
+      <a routerLink="/teacher/courses/create"
+         routerLinkActive="text-blue-600 font-semibold"
+         class="text-gray-600 hover:text-blue-600">
+        Créer un cours
+      </a>
+    </ng-container>
+
+    <!-- ✅ STUDENT (tous les rôles) -->
+    <ng-container *ngIf="authService.isLoggedIn()">
+      <a routerLink="/student/dashboard"
+         routerLinkActive="text-blue-600 font-semibold"
+         class="text-gray-600 hover:text-blue-600">
+        Dashboard
+      </a>
+      <a routerLink="/student/courses/catalog"
+         routerLinkActive="text-blue-600 font-semibold"
+         class="text-gray-600 hover:text-blue-600">
+        Catalogue
+      </a>
+      <a routerLink="/student/courses/my-courses"
+         routerLinkActive="text-blue-600 font-semibold"
+         class="text-gray-600 hover:text-blue-600">
+        Mes formations
+      </a>
+    </ng-container>
+
+    <!-- ✅ Infos utilisateur + Logout -->
+    <ng-container *ngIf="authService.isLoggedIn()">
+      <span class="text-gray-400 text-sm">
+        {{ authService.getCurrentUsername() }}
+        <span class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium"
+              [ngClass]="{
+                'bg-red-100 text-red-700': authService.isAdmin(),
+                'bg-blue-100 text-blue-700': authService.isTeacher(),
+                'bg-green-100 text-green-700': authService.isStudent()
+              }">
+          {{ authService.getUserRole() }}
+        </span>
+      </span>
+
+      <button (click)="logout()"
+              class="bg-red-500 text-white px-4 py-1.5 rounded-lg
+                     hover:bg-red-600 text-sm">
+        Déconnexion
+      </button>
+    </ng-container>
+
+    <!-- ✅ Pas connecté -->
+    <ng-container *ngIf="!authService.isLoggedIn()">
+      <a routerLink="/login"
+         class="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 text-sm">
+        Connexion
+      </a>
+    </ng-container>
+
+  </div>
+</nav>

@@ -1,0 +1,201 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">My Courses</h1>
+          <p class="mt-1 text-sm text-gray-600">Create and manage your courses</p>
+        </div>
+        <button
+          (click)="createCourse()"
+          class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+          <div class="flex items-center gap-2">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Create Course
+          </div>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">Filter:</span>
+        <button
+          (click)="filterByPublished(undefined)"
+          class="px-4 py-2 text-sm rounded-lg transition duration-150"
+          [class.bg-purple-100]="filterPublished() === undefined"
+          [class.text-purple-700]="filterPublished() === undefined"
+          [class.font-medium]="filterPublished() === undefined"
+          [class.text-gray-600]="filterPublished() !== undefined"
+          [class.hover:bg-gray-100]="filterPublished() !== undefined">
+          All
+        </button>
+        <button
+          (click)="filterByPublished(true)"
+          class="px-4 py-2 text-sm rounded-lg transition duration-150"
+          [class.bg-green-100]="filterPublished() === true"
+          [class.text-green-700]="filterPublished() === true"
+          [class.font-medium]="filterPublished() === true"
+          [class.text-gray-600]="filterPublished() !== true"
+          [class.hover:bg-gray-100]="filterPublished() !== true">
+          Published
+        </button>
+        <button
+          (click)="filterByPublished(false)"
+          class="px-4 py-2 text-sm rounded-lg transition duration-150"
+          [class.bg-gray-200]="filterPublished() === false"
+          [class.text-gray-700]="filterPublished() === false"
+          [class.font-medium]="filterPublished() === false"
+          [class.text-gray-600]="filterPublished() !== false"
+          [class.hover:bg-gray-100]="filterPublished() !== false">
+          Draft
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="animate-spin h-8 w-8 text-purple-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-500 mt-2">Loading courses...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && courses().length === 0" class="bg-white rounded-lg shadow p-12 text-center">
+      <svg class="h-24 w-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No courses yet</h3>
+      <p class="text-gray-500 mb-6">Get started by creating your first course</p>
+      <button
+        (click)="createCourse()"
+        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+        Create Your First Course
+      </button>
+    </div>
+
+    <!-- Courses Grid -->
+    <div *ngIf="!loading() && courses().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let course of courses()" class="bg-white rounded-lg shadow hover:shadow-lg transition duration-150">
+        <div class="p-6">
+          <!-- Status Badge -->
+          <div class="flex items-center justify-between mb-4">
+            <span *ngIf="course.published" class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+              Published
+            </span>
+            <span *ngIf="!course.published" class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+              Draft
+            </span>
+            <span *ngIf="course.level" class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+              {{ course.level }}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+            {{ course.title }}
+          </h3>
+
+          <!-- Summary -->
+          <p *ngIf="course.summary" class="text-sm text-gray-600 mb-4 line-clamp-3">
+            {{ course.summary }}
+          </p>
+
+          <!-- Meta -->
+          <div class="flex items-center gap-4 text-xs text-gray-500 mb-4">
+            <span *ngIf="course.estimatedHours">
+              <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              {{ course.estimatedHours }}h
+            </span>
+            <span *ngIf="course.category">
+              <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+              </svg>
+              {{ course.category }}
+            </span>
+          </div>
+
+          <!-- Created Date -->
+          <p class="text-xs text-gray-400 mb-4">
+            Created {{ formatDate(course.createdAt) }}
+          </p>
+
+          <!-- Actions -->
+<!-- Actions -->
+<div class="flex flex-col gap-2">
+  <!-- ✅ NOUVEAU : Gérer le contenu (Bouton Principal) -->
+  <button
+    (click)="manageCourseContent(course.id)"
+    class="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150 flex items-center justify-center gap-2">
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+    </svg>
+    Manage Content
+  </button>
+
+  <!-- Actions secondaires (sur la même ligne) -->
+          <div class="flex items-center gap-2">
+            <button
+              (click)="editCourse(course.id)"
+              class="flex-1 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-150">
+              Edit
+            </button>
+            <button
+              (click)="togglePublish(course)"
+              class="flex-1 px-3 py-2 text-sm font-medium rounded-lg transition duration-150"
+              [class.text-green-700]="!course.published"
+              [class.bg-green-50]="!course.published"
+              [class.hover:bg-green-100]="!course.published"
+              [class.text-gray-700]="course.published"
+              [class.bg-gray-100]="course.published"
+              [class.hover:bg-gray-200]="course.published">
+              {{ course.published ? 'Unpublish' : 'Publish' }}
+            </button>
+            <button
+              (click)="deleteCourse(course)"
+              class="px-3 py-2 text-sm font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition duration-150">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading() && courses().length > 0 && totalPages() > 1" class="mt-8 flex items-center justify-between bg-white rounded-lg shadow p-4">
+      <div class="text-sm text-gray-700">
+        Showing <span class="font-medium">{{ currentPage() * pageSize + 1 }}</span> to
+        <span class="font-medium">{{ Math.min((currentPage() + 1) * pageSize, totalElements()) }}</span> of
+        <span class="font-medium">{{ totalElements() }}</span> courses
+      </div>
+      <div class="flex gap-2">
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage() === 0"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+          Previous
+        </button>
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage() >= totalPages() - 1"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

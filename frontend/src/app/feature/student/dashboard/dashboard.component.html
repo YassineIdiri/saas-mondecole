@@ -1,0 +1,176 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <h1 class="text-3xl font-bold text-gray-900">My Learning Dashboard</h1>
+      <p class="mt-1 text-sm text-gray-600">Track your progress and continue learning</p>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="animate-spin h-8 w-8 text-purple-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-500 mt-2">Loading dashboard...</p>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div *ngIf="!loading() && dashboard()">
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Total Enrolled -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-purple-100 rounded-lg p-3">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Enrolled Courses</p>
+              <p class="text-2xl font-bold text-gray-900">{{ dashboard()!.stats.totalEnrolledCourses }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
+              <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">In Progress</p>
+              <p class="text-2xl font-bold text-gray-900">{{ dashboard()!.stats.inProgressCourses }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
+              <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Completed</p>
+              <p class="text-2xl font-bold text-gray-900">{{ dashboard()!.stats.completedCourses }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Average Progress -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-yellow-100 rounded-lg p-3">
+              <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Avg Progress</p>
+              <p class="text-2xl font-bold text-gray-900">{{ dashboard()!.stats.averageProgress }}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- In Progress Courses -->
+      <div *ngIf="dashboard()!.inProgressCourses.length > 0" class="bg-white rounded-lg shadow mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Continue Learning</h2>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div *ngFor="let course of dashboard()!.inProgressCourses"
+                 class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-150 cursor-pointer"
+                 [routerLink]="['/student/courses', course.courseId]">
+              <div class="flex items-center flex-1">
+                <img *ngIf="course.courseThumbnail"
+                     [src]="course.courseThumbnail"
+                     [alt]="course.courseTitle"
+                     class="h-16 w-16 rounded-lg object-cover">
+                <div *ngIf="!course.courseThumbnail"
+                     class="h-16 w-16 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+                <div class="ml-4 flex-1">
+                  <h3 class="text-sm font-medium text-gray-900">{{ course.courseTitle }}</h3>
+                  <p class="text-xs text-gray-500">{{ course.teacherName }}</p>
+                  <div class="mt-2">
+                    <div class="flex items-center">
+                      <div class="flex-1 bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full" [style.width.%]="course.progressPercent"></div>
+                      </div>
+                      <span class="ml-2 text-xs font-medium text-gray-700">{{ course.progressPercent }}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a routerLink="/student/courses/catalog"
+           class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow p-6 text-white hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+          <div class="flex items-center">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <div class="ml-4">
+              <p class="text-lg font-semibold">Browse Catalog</p>
+              <p class="text-sm opacity-90">Discover new courses</p>
+            </div>
+          </div>
+        </a>
+
+        <a routerLink="/student/courses/my-courses"
+           class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition duration-150">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-100 rounded-lg p-3">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-lg font-semibold text-gray-900">My Courses</p>
+              <p class="text-sm text-gray-600">View enrolled courses</p>
+            </div>
+          </div>
+        </a>
+
+        <a routerLink="/student/certificates"
+           class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition duration-150">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-green-100 rounded-lg p-3">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-lg font-semibold text-gray-900">Certificates</p>
+              <p class="text-sm text-gray-600">View achievements</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

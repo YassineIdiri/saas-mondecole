@@ -1,0 +1,268 @@
+<div class="min-h-screen bg-slate-950">
+
+  <!-- Loading initial -->
+  <div *ngIf="loading() && lessons().length === 0" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <svg class="animate-spin h-8 w-8 text-violet-500 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-slate-400 mt-3 text-sm">Chargement...</p>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <button
+            (click)="onBack()"
+            class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-150">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Gestion des Leçons</h1>
+            <p class="mt-0.5 text-sm text-slate-400">Organisez le contenu de cette section</p>
+          </div>
+        </div>
+        <button
+          *ngIf="!showLessonForm()"
+          (click)="onAddLesson()"
+          class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-500 transition-all duration-150">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Ajouter une leçon
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Error -->
+    <div *ngIf="error()" class="bg-red-950 border border-red-800 rounded-xl p-4">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <svg class="h-5 w-5 text-red-400 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <p class="text-sm text-red-300">{{ error() }}</p>
+        </div>
+        <button (click)="error.set(null)" class="text-red-400 hover:text-red-200 transition-colors">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lesson Form -->
+    <div *ngIf="showLessonForm()" class="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-5">
+      <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-widest">
+        {{ editingLesson() ? 'Modifier la leçon' : 'Nouvelle leçon' }}
+      </h2>
+
+      <!-- Titre -->
+      <div>
+        <label for="lesson-title" class="block text-sm font-medium text-slate-300 mb-2">
+          Titre <span class="text-violet-400">*</span>
+        </label>
+        <input
+          id="lesson-title"
+          type="text"
+          [(ngModel)]="lessonForm.title"
+          placeholder="Ex: Les variables en Java"
+          [disabled]="loading()"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 disabled:opacity-50">
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label for="lesson-description" class="block text-sm font-medium text-slate-300 mb-2">Description</label>
+        <textarea
+          id="lesson-description"
+          [(ngModel)]="lessonForm.description"
+          rows="3"
+          placeholder="Description courte de la leçon (optionnel)"
+          [disabled]="loading()"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 resize-none disabled:opacity-50"></textarea>
+      </div>
+
+      <!-- Type -->
+      <div>
+        <label for="lesson-type" class="block text-sm font-medium text-slate-300 mb-2">
+          Type de contenu <span class="text-violet-400">*</span>
+        </label>
+        <select
+          id="lesson-type"
+          [(ngModel)]="lessonForm.type"
+          [disabled]="loading()"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 appearance-none cursor-pointer disabled:opacity-50">
+          <option value="TEXT" class="bg-slate-800">📝 Texte / Article</option>
+          <option value="VIDEO" class="bg-slate-800">🎥 Vidéo</option>
+          <option value="QUIZ" class="bg-slate-800">❓ Quiz</option>
+          <option value="DOCUMENT" class="bg-slate-800">📄 Document</option>
+        </select>
+      </div>
+
+      <!-- Contenu -->
+      <div>
+        <label for="lesson-content" class="block text-sm font-medium text-slate-300 mb-1">
+          Contenu <span class="text-violet-400">*</span>
+        </label>
+        <p class="text-xs text-slate-500 mb-2">Le texte de votre leçon que les étudiants liront</p>
+        <textarea
+          id="lesson-content"
+          [(ngModel)]="lessonForm.content"
+          rows="20"
+          [disabled]="loading()"
+          placeholder="Écrivez le contenu de votre leçon ici...
+
+Vous pouvez utiliser du Markdown :
+
+**Gras**, *Italique*, \`code\`
+
+# Titre principal
+## Sous-titre
+
+- Liste à puces
+1. Liste numérotée"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 resize-y font-mono text-sm disabled:opacity-50"></textarea>
+        <p class="mt-1.5 text-xs text-slate-500">
+          Support Markdown :
+          <code class="px-1 py-0.5 bg-slate-800 rounded text-violet-400">**gras**</code>
+          <code class="px-1 py-0.5 bg-slate-800 rounded text-violet-400 ml-1">*italique*</code>
+          <code class="px-1 py-0.5 bg-slate-800 rounded text-violet-400 ml-1">`code`</code>
+          <code class="px-1 py-0.5 bg-slate-800 rounded text-violet-400 ml-1"># titre</code>
+        </p>
+      </div>
+
+      <!-- URL Vidéo (si type VIDEO) -->
+      <div *ngIf="lessonForm.type === 'VIDEO'">
+        <label for="lesson-video" class="block text-sm font-medium text-slate-300 mb-2">
+          URL de la Vidéo <span class="text-slate-500">(YouTube, Vimeo...)</span>
+        </label>
+        <input
+          id="lesson-video"
+          type="url"
+          [(ngModel)]="lessonForm.externalVideoUrl"
+          placeholder="https://youtube.com/watch?v=..."
+          [disabled]="loading()"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 disabled:opacity-50">
+      </div>
+
+      <!-- Durée (si type VIDEO) -->
+      <div *ngIf="lessonForm.type === 'VIDEO'">
+        <label for="lesson-duration" class="block text-sm font-medium text-slate-300 mb-2">
+          Durée <span class="text-slate-500">(en secondes)</span>
+        </label>
+        <input
+          id="lesson-duration"
+          type="number"
+          [(ngModel)]="lessonForm.durationSeconds"
+          placeholder="Ex: 600 (pour 10 minutes)"
+          [disabled]="loading()"
+          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 disabled:opacity-50">
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button
+          (click)="onCancel()"
+          [disabled]="loading()"
+          class="px-5 py-2.5 text-sm font-medium text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 hover:text-white transition-all duration-150 disabled:opacity-50">
+          Annuler
+        </button>
+        <button
+          (click)="onSaveLesson()"
+          [disabled]="loading() || !lessonForm.title || !lessonForm.content"
+          class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150">
+          <svg *ngIf="loading()" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span *ngIf="!loading()">{{ editingLesson() ? 'Mettre à jour' : 'Créer la leçon' }}</span>
+          <span *ngIf="loading()">Enregistrement...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lessons List -->
+    <div *ngIf="!showLessonForm()" class="space-y-3">
+
+      <!-- Empty State -->
+      <div *ngIf="lessons().length === 0" class="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
+        <svg class="h-12 w-12 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-base font-semibold text-white mb-1">Aucune leçon pour le moment</h3>
+        <p class="text-sm text-slate-400 mb-6">Créez votre première leçon pour commencer à remplir cette section</p>
+        <button
+          (click)="onAddLesson()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-500 transition-all duration-150">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Créer la première leçon
+        </button>
+      </div>
+
+      <!-- Lesson Cards -->
+      <div
+        *ngFor="let lesson of lessons(); let i = index"
+        class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-center gap-5 hover:border-slate-700 transition-all duration-150">
+
+        <!-- Index -->
+        <div class="shrink-0 w-9 h-9 flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-sm font-bold text-slate-400">
+          {{ i + 1 }}
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3">
+            <h3 class="text-base font-semibold text-white truncate">{{ lesson.title }}</h3>
+
+            <!-- Type badge -->
+            <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full"
+              [ngClass]="{
+                'text-blue-400 bg-blue-950 border border-blue-800': lesson.type === 'TEXT',
+                'text-rose-400 bg-rose-950 border border-rose-800': lesson.type === 'VIDEO',
+                'text-amber-400 bg-amber-950 border border-amber-800': lesson.type === 'QUIZ',
+                'text-emerald-400 bg-emerald-950 border border-emerald-800': lesson.type === 'DOCUMENT'
+              }">
+              <span *ngIf="lesson.type === 'TEXT'">📝</span>
+              <span *ngIf="lesson.type === 'VIDEO'">🎥</span>
+              <span *ngIf="lesson.type === 'QUIZ'">❓</span>
+              <span *ngIf="lesson.type === 'DOCUMENT'">📄</span>
+              {{ lesson.type }}
+            </span>
+
+            <!-- Duration -->
+            <span *ngIf="lesson.durationSeconds" class="shrink-0 text-xs text-slate-500">
+              ⏱ {{ formatDuration(lesson.durationSeconds) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="shrink-0 flex items-center gap-2">
+          <button
+            (click)="onEditLesson(lesson)"
+            class="px-3 py-2 text-xs font-medium text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 hover:text-white transition-all duration-150">
+            Modifier
+          </button>
+          <button
+            (click)="onDeleteLesson(lesson.id)"
+            class="px-3 py-2 text-xs font-medium text-red-400 border border-red-900 rounded-lg hover:bg-red-950 transition-all duration-150">
+            Supprimer
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

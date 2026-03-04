@@ -1,0 +1,190 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">My Courses</h1>
+          <p class="mt-1 text-sm text-gray-600">Continue learning where you left off</p>
+        </div>
+        <a routerLink="/student/courses/catalog"
+           class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+          Browse Catalog
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium text-gray-700">Filter:</span>
+        <button
+          (click)="setFilter('all')"
+          class="px-4 py-2 text-sm rounded-lg transition duration-150"
+          [class.bg-purple-100]="filter() === 'all'"
+          [class.text-purple-700]="filter() === 'all'"
+          [class.font-medium]="filter() === 'all'"
+          [class.text-gray-600]="filter() !== 'all'"
+          [class.hover:bg-gray-100]="filter() !== 'all'">
+          All Courses
+        </button>
+        <button
+          (click)="setFilter('in-progress')"
+          class="px-4 py-2 text-sm rounded-lg transition duration-150"
+          [class.bg-blue-100]="filter() === 'in-progress'"
+          [class.text-blue-700]="filter() === 'in-progress'"
+          [class.font-medium]="filter() === 'in-progress'"
+          [class.text-gray-600]="filter() !== 'in-progress'"
+          [class.hover:bg-gray-100]="filter() !== 'in-progress'">
+          In Progress
+        </button>
+        <button
+          (click)="setFilter('completed')"
+          class="px-4 py-2 text-sm rounded-lg transition duration-150"
+          [class.bg-green-100]="filter() === 'completed'"
+          [class.text-green-700]="filter() === 'completed'"
+          [class.font-medium]="filter() === 'completed'"
+          [class.text-gray-600]="filter() !== 'completed'"
+          [class.hover:bg-gray-100]="filter() !== 'completed'">
+          Completed
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="animate-spin h-8 w-8 text-purple-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-500 mt-2">Loading courses...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading() && courses().length === 0" class="bg-white rounded-lg shadow p-12 text-center">
+      <svg class="h-24 w-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No enrolled courses</h3>
+      <p class="text-gray-500 mb-6">Start learning by browsing our course catalog</p>
+      <a routerLink="/student/courses/catalog"
+         class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150 inline-block">
+        Browse Catalog
+      </a>
+    </div>
+
+    <!-- Courses List -->
+    <div *ngIf="!loading() && courses().length > 0" class="space-y-4">
+      <div *ngFor="let course of courses()"
+           class="bg-white rounded-lg shadow hover:shadow-lg transition duration-150">
+        <div class="p-6">
+          <div class="flex items-start gap-6">
+            <!-- Thumbnail -->
+            <div class="flex-shrink-0">
+              <div class="h-32 w-48 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 overflow-hidden">
+                <img *ngIf="course.thumbnailUrl"
+                     [src]="course.thumbnailUrl"
+                     [alt]="course.title"
+                     class="w-full h-full object-cover">
+                <div *ngIf="!course.thumbnailUrl" class="w-full h-full flex items-center justify-center">
+                  <svg class="h-12 w-12 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1">
+              <!-- Status Badge -->
+              <div class="mb-2">
+                <span *ngIf="course.enrollment?.completed"
+                      class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                  Completed
+                </span>
+                <span *ngIf="course.enrollment && !course.enrollment.completed"
+                      class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                  In Progress
+                </span>
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                {{ course.title }}
+              </h3>
+
+              <!-- Summary -->
+              <p *ngIf="course.summary" class="text-sm text-gray-600 mb-4 line-clamp-2">
+                {{ course.summary }}
+              </p>
+
+              <!-- Teacher & Meta -->
+              <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                <span>
+                  <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                  {{ course.teacher.fullName }}
+                </span>
+                <span *ngIf="course.enrollment?.lastAccessedAt">
+                  Last accessed {{ formatDate(course.enrollment?.lastAccessedAt) }}
+                </span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div *ngIf="course.enrollment" class="mb-4">
+                <div class="flex items-center justify-between text-xs text-gray-600 mb-1">
+                  <span>Progress</span>
+                  <span class="font-medium">{{ course.enrollment.progressPercent }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="h-2.5 rounded-full transition-all duration-300"
+                       [class.bg-green-600]="course.enrollment.completed"
+                       [class.bg-purple-600]="!course.enrollment.completed"
+                       [style.width.%]="course.enrollment.progressPercent"></div>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <a [routerLink]="['/student/courses', course.id]"
+                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+                <span *ngIf="!course.enrollment?.completed">Continue Learning</span>
+                <span *ngIf="course.enrollment?.completed">Review Course</span>
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading() && courses().length > 0 && totalPages() > 1"
+         class="mt-8 flex items-center justify-between bg-white rounded-lg shadow p-4">
+      <div class="text-sm text-gray-700">
+        Showing <span class="font-medium">{{ currentPage() * pageSize + 1 }}</span> to
+        <span class="font-medium">{{ Math.min((currentPage() + 1) * pageSize, totalElements()) }}</span> of
+        <span class="font-medium">{{ totalElements() }}</span> courses
+      </div>
+      <div class="flex gap-2">
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage() === 0"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+          Previous
+        </button>
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage() >= totalPages() - 1"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

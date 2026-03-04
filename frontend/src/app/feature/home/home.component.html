@@ -1,0 +1,180 @@
+<div class="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 overflow-x-hidden selection:bg-blue-600 selection:text-white">
+
+  <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/40 bg-white/60 backdrop-blur-xl shadow-sm transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <div class="flex items-center gap-2 cursor-pointer" routerLink="/">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-700 to-sky-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20 ring-1 ring-white/50">
+            A
+          </div>
+          <span class="font-bold text-xl tracking-tight text-slate-800">Academi<span class="text-blue-600">SaaS</span></span>
+        </div>
+
+        <div class="hidden md:flex items-center gap-6">
+            <ng-container *ngIf="isLoggedIn">
+                <button (click)="goToDashboard()" class="text-sm font-bold text-blue-700 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors">
+                    Mon Espace
+                </button>
+            </ng-container>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden pointer-events-none">
+      <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/20 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob"></div>
+      <div class="absolute top-[10%] right-[-10%] w-[500px] h-[500px] bg-sky-300/20 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
+      <div class="absolute bottom-[-20%] left-[20%] w-[600px] h-[600px] bg-slate-200/40 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-blob animation-delay-4000"></div>
+      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+        <div class="text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/60 border border-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wide mb-8 backdrop-blur-sm shadow-sm">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                </span>
+                Solution Académique V2.0
+            </div>
+
+            <h1 class="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight mb-6 leading-[1.1]">
+                L'excellence <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-500 to-sky-400">
+                Opérationnelle.
+                </span>
+            </h1>
+
+            <p class="mt-4 max-w-lg text-lg text-slate-600 leading-relaxed font-medium">
+                La plateforme B2B tout-en-un pour gérer vos formations, vos étudiants et votre organisation avec une fluidité absolue.
+            </p>
+        </div>
+
+        <div class="relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-sky-400 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+
+            <div class="relative bg-white/40 backdrop-blur-2xl border border-white/60 p-6 rounded-[2rem] shadow-2xl ring-1 ring-white/50">
+
+                <h3 class="text-slate-800 font-bold mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Accès Rapide
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <a routerLink="/organization/register" class="group/item relative flex flex-col justify-between p-5 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                        <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white mb-3 backdrop-blur-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <div>
+                            <span class="block text-white font-bold text-lg">Créer mon École</span>
+                            <span class="text-blue-100 text-xs font-medium opacity-90">Démarrer maintenant &rarr;</span>
+                        </div>
+                    </a>
+
+                    <a routerLink="/join" class="group/item relative flex flex-col justify-between p-5 bg-white/60 hover:bg-white/80 border border-white/60 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        </div>
+                        <div>
+                            <span class="block text-slate-800 font-bold text-lg">Rejoindre</span>
+                            <span class="text-slate-500 text-xs font-medium">Étudiant ou Professeur</span>
+                        </div>
+                    </a>
+
+                    <a routerLink="/login" class="group/item relative flex flex-col justify-between p-5 bg-slate-50/50 hover:bg-white border border-white/60 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="w-10 h-10 bg-slate-200 text-slate-600 rounded-lg flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                        </div>
+                        <div>
+                            <span class="block text-slate-800 font-bold text-lg">Me Connecter</span>
+                            <span class="text-slate-500 text-xs font-medium">Accès membre</span>
+                        </div>
+                    </a>
+
+                     <a routerLink="/login" class="group/item relative flex flex-col justify-between p-5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-2xl shadow-lg hover:shadow-slate-900/20 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                        <div class="w-10 h-10 bg-slate-700 text-blue-400 rounded-lg flex items-center justify-center mb-3 border border-slate-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <div>
+                            <span class="block text-white font-bold text-lg">Gérer mon organisation</span>
+                            <span class="text-slate-400 text-xs font-medium">Administration</span>
+                        </div>
+                    </a>
+
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-200/60 flex items-center justify-between text-xs text-slate-500 font-medium">
+                    <span>🔒 Sécurisé & Chiffré</span>
+                </div>
+            </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <section class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-blue-600 font-bold tracking-wide uppercase text-sm">Pourquoi AcademiSaaS ?</h2>
+        <p class="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+          Une suite d'outils puissants.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group">
+          <div class="w-14 h-14 bg-white text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform ring-1 ring-slate-100">
+             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Gestion Unifiée</h3>
+          <p class="text-slate-500 text-sm leading-relaxed">
+            Centralisez vos étudiants, professeurs et administrateurs dans un seul espace sécurisé.
+          </p>
+        </div>
+
+        <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group">
+            <div class="w-14 h-14 bg-white text-sky-500 rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform ring-1 ring-slate-100">
+             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Catalogue de Cours</h3>
+          <p class="text-slate-500 text-sm leading-relaxed">
+            Interface moderne type "Netflix" pour que vos étudiants accèdent facilement à leur contenu.
+          </p>
+        </div>
+
+        <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group">
+            <div class="w-14 h-14 bg-white text-blue-800 rounded-2xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform ring-1 ring-slate-100">
+             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Analytics & Suivi</h3>
+          <p class="text-slate-500 text-sm leading-relaxed">
+            Tableaux de bord détaillés pour suivre la progression, l'assiduité et les performances.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm">
+      <div class="mb-4 md:mb-0">
+          <span class="font-bold text-lg text-white">Academi<span class="text-blue-500">SaaS</span></span>
+          <p class="mt-1 text-slate-500">© 2024. All rights reserved.</p>
+      </div>
+      <div class="flex gap-8">
+        <a href="#" class="hover:text-blue-400 transition-colors">Documentation</a>
+        <a href="#" class="hover:text-blue-400 transition-colors">API</a>
+        <a href="#" class="hover:text-blue-400 transition-colors">Support</a>
+      </div>
+    </div>
+  </footer>
+
+</div>

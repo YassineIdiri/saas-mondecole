@@ -1,0 +1,304 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-600 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full">
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+
+      <!-- Success Message -->
+      <div *ngIf="successMessage()" class="text-center">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+          Welcome aboard! 🎉
+        </h2>
+
+        <p class="text-gray-600 mb-4">
+          {{ successMessage() }}
+        </p>
+
+        <p class="text-sm text-gray-500">
+          Redirecting to login...
+        </p>
+      </div>
+
+      <!-- Registration Form -->
+      <div *ngIf="!successMessage()">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-extrabold text-gray-900">
+            Join an Organization
+          </h2>
+          <p class="mt-2 text-sm text-gray-600">
+            Enter your invitation code to get started
+          </p>
+        </div>
+
+        <form [formGroup]="joinForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+          <!-- Step 1: Invitation Code -->
+          <div *ngIf="!codeVerified()">
+            <label for="invitationCode" class="block text-sm font-medium text-gray-700 mb-2">
+              Invitation Code
+            </label>
+            <div class="flex gap-2">
+              <input
+                id="invitationCode"
+                type="text"
+                formControlName="invitationCode"
+                class="flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                [class.border-red-500]="invitationCode?.invalid && invitationCode?.touched"
+                placeholder="ABC-12345678"
+                (keyup.enter)="verifyCode()"
+              />
+              <button
+                type="button"
+                (click)="verifyCode()"
+                [disabled]="verifyingCode() || !invitationCode?.value"
+                class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+                <span *ngIf="!verifyingCode()">Verify</span>
+                <span *ngIf="verifyingCode()">
+                  <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              </button>
+            </div>
+            <p *ngIf="invitationCode?.invalid && invitationCode?.touched" class="mt-2 text-sm text-red-600">
+              Invitation code is required
+            </p>
+          </div>
+
+          <!-- Organization Info (after verification) -->
+          <div *ngIf="codeVerified() && organizationInfo()" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex items-start">
+              <svg class="h-6 w-6 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800">
+                  Valid Code! ✅
+                </h3>
+                <p class="text-sm text-green-700 mt-1">
+                  You're joining: <strong>{{ organizationInfo().name }}</strong>
+                </p>
+                <button
+                  type="button"
+                  (click)="codeVerified.set(false); organizationInfo.set(null)"
+                  class="mt-2 text-xs text-green-600 hover:text-green-800 underline">
+                  Change code
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Role Selection -->
+          <div *ngIf="codeVerified()">
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              I am joining as:
+            </label>
+            <div class="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                (click)="selectRole('TEACHER')"
+                class="p-4 border-2 rounded-lg transition duration-150"
+                [class.border-blue-600]="selectedRole() === 'TEACHER'"
+                [class.bg-blue-50]="selectedRole() === 'TEACHER'"
+                [class.border-gray-300]="selectedRole() !== 'TEACHER'">
+                <div class="flex flex-col items-center">
+                  <svg class="h-8 w-8 mb-2" [class.text-blue-600]="selectedRole() === 'TEACHER'" [class.text-gray-400]="selectedRole() !== 'TEACHER'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                  <span class="font-medium" [class.text-blue-600]="selectedRole() === 'TEACHER'">Teacher</span>
+                  <span class="text-xs text-gray-500 mt-1">Create & manage courses</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                (click)="selectRole('STUDENT')"
+                class="p-4 border-2 rounded-lg transition duration-150"
+                [class.border-blue-600]="selectedRole() === 'STUDENT'"
+                [class.bg-blue-50]="selectedRole() === 'STUDENT'"
+                [class.border-gray-300]="selectedRole() !== 'STUDENT'">
+                <div class="flex flex-col items-center">
+                  <svg class="h-8 w-8 mb-2" [class.text-blue-600]="selectedRole() === 'STUDENT'" [class.text-gray-400]="selectedRole() !== 'STUDENT'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>
+                  </svg>
+                  <span class="font-medium" [class.text-blue-600]="selectedRole() === 'STUDENT'">Student</span>
+                  <span class="text-xs text-gray-500 mt-1">Access courses</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Personal Info -->
+          <div *ngIf="codeVerified()" class="space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
+                  First Name *
+                </label>
+                <input
+                  id="firstName"
+                  type="text"
+                  formControlName="firstName"
+                  class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="(firstName?.invalid && firstName?.touched) || getFieldError('firstName')"
+                  placeholder="John"
+                />
+                <p *ngIf="firstName?.invalid && firstName?.touched" class="mt-2 text-sm text-red-600">
+                  First name is required
+                </p>
+              </div>
+
+              <div>
+                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
+                  Last Name *
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  formControlName="lastName"
+                  class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="(lastName?.invalid && lastName?.touched) || getFieldError('lastName')"
+                  placeholder="Doe"
+                />
+                <p *ngIf="lastName?.invalid && lastName?.touched" class="mt-2 text-sm text-red-600">
+                  Last name is required
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                Username *
+              </label>
+              <input
+                id="username"
+                type="text"
+                formControlName="username"
+                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="(username?.invalid && username?.touched) || getFieldError('username')"
+                placeholder="johndoe"
+              />
+              <p *ngIf="username?.invalid && username?.touched" class="mt-2 text-sm text-red-600">
+                <span *ngIf="username?.errors?.['required']">Username is required</span>
+                <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters</span>
+                <span *ngIf="username?.errors?.['pattern']">Username can only contain letters, numbers, dashes and underscores</span>
+              </p>
+              <p *ngIf="getFieldError('username')" class="mt-2 text-sm text-red-600">
+                {{ getFieldError('username') }}
+              </p>
+            </div>
+
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                Email *
+              </label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="(email?.invalid && email?.touched) || getFieldError('email')"
+                placeholder="john@example.com"
+              />
+              <p *ngIf="email?.invalid && email?.touched" class="mt-2 text-sm text-red-600">
+                <span *ngIf="email?.errors?.['required']">Email is required</span>
+                <span *ngIf="email?.errors?.['email']">Invalid email format</span>
+              </p>
+              <p *ngIf="getFieldError('email')" class="mt-2 text-sm text-red-600">
+                {{ getFieldError('email') }}
+              </p>
+            </div>
+
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                Password *
+              </label>
+              <input
+                id="password"
+                type="password"
+                formControlName="password"
+                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="(password?.invalid && password?.touched) || getFieldError('password')"
+                placeholder="Create a strong password"
+              />
+              <p *ngIf="password?.invalid && password?.touched" class="mt-2 text-sm text-red-600">
+                <span *ngIf="password?.errors?.['required']">Password is required</span>
+                <span *ngIf="password?.errors?.['minlength']">Password must be at least 8 characters</span>
+                <span *ngIf="password?.errors?.['weakPassword']">Password must contain uppercase, lowercase, number and special character</span>
+              </p>
+            </div>
+
+            <div>
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password *
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                formControlName="confirmPassword"
+                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="confirmPassword?.invalid && confirmPassword?.touched"
+                placeholder="Confirm your password"
+              />
+              <p *ngIf="confirmPassword?.invalid && confirmPassword?.touched" class="mt-2 text-sm text-red-600">
+                Please confirm your password
+              </p>
+              <p *ngIf="joinForm.errors?.['passwordMismatch'] && confirmPassword?.touched" class="mt-2 text-sm text-red-600">
+                Passwords do not match
+              </p>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage()" class="rounded-lg bg-red-50 border border-red-200 p-4">
+            <div class="flex">
+              <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              <p class="ml-3 text-sm text-red-800">{{ errorMessage() }}</p>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            *ngIf="codeVerified()"
+            [disabled]="loading() || joinForm.invalid"
+            class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+            <span *ngIf="!loading()">Join Organization</span>
+            <span *ngIf="loading()" class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Joining...
+            </span>
+          </button>
+
+          <!-- Links -->
+          <div class="text-center space-y-2">
+            <p class="text-sm text-gray-600">
+              Need to create an organization?
+              <a routerLink="/organization/register" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+                Register here
+              </a>
+            </p>
+            <p class="text-sm text-gray-600">
+              Already have an account?
+              <a routerLink="/login" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+                Sign in
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

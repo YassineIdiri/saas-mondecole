@@ -1,0 +1,259 @@
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="animate-spin h-8 w-8 text-purple-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-500 mt-2">Loading lesson...</p>
+    </div>
+  </div>
+
+  <!-- Lesson Content -->
+  <div *ngIf="!loading() && lesson()">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center flex-1">
+            <button (click)="router.navigate(['/student/courses/my-courses'])"
+                    class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition duration-150">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+            <div class="ml-4 flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="px-2 py-1 text-xs font-semibold rounded"
+                      [ngClass]="getLessonTypeColor(lesson()!.type)">
+                  {{ lesson()!.type }}
+                </span>
+                <span class="text-xs text-gray-500">
+                  {{ lesson()!.navigation.sectionTitle }}
+                </span>
+              </div>
+              <h1 class="text-lg font-semibold text-gray-900">{{ lesson()!.title }}</h1>
+              <p class="text-xs text-gray-500">
+                Lesson {{ lesson()!.navigation.lessonNumber }} of {{ lesson()!.navigation.totalLessons }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Progress Badge -->
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <div class="text-sm font-medium text-gray-900">
+                {{ lesson()!.progress.progressPercent }}%
+              </div>
+              <div class="text-xs text-gray-500">Progress</div>
+            </div>
+            <div *ngIf="lesson()!.progress.completed"
+                 class="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-lg">
+              <svg class="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-sm font-medium text-green-800">Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <!-- Left: Lesson Content (3 columns) -->
+        <div class="lg:col-span-3">
+          <div class="bg-white rounded-lg shadow">
+
+          <!-- VIDEO Lesson -->
+        <div *ngIf="lesson()!.type === 'VIDEO'" class="aspect-video bg-black rounded-t-lg flex items-center justify-center">
+          <!-- ✅ Utiliser hasVideo() et videoUrl() computed signals -->
+          <div *ngIf="hasVideo()" class="w-full h-full">
+            <iframe
+              [src]="videoUrl() | safe: 'resourceUrl'"
+              class="w-full h-full"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+
+          <div *ngIf="!hasVideo()" class="text-white text-center">
+            <svg class="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-sm">Video not available</p>
+          </div>
+        </div>
+
+            <!-- DOCUMENT/FILE Lesson -->
+            <div *ngIf="lesson()!.type === 'DOCUMENT' && lesson()!.fileUrl" class="p-8 bg-gray-50 rounded-t-lg">
+              <div class="max-w-2xl mx-auto text-center">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4">
+                  <svg class="h-10 w-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ lesson()!.fileName }}</h3>
+                <p class="text-sm text-gray-500 mb-6">
+                  {{ lesson()!.mimeType }} • {{ formatFileSize(lesson()!.fileSizeBytes) }}
+                </p>
+                <button *ngIf="lesson()!.downloadable"
+                        (click)="downloadFile()"
+                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+                  <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  Download Document
+                </button>
+                <p *ngIf="!lesson()!.downloadable" class="text-sm text-gray-500">
+                  Download not available for this document
+                </p>
+              </div>
+            </div>
+
+            <!-- Content Body -->
+            <div class="p-8">
+
+              <!-- Description -->
+              <div *ngIf="lesson()!.description" class="mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">About This Lesson</h2>
+                <div class="prose max-w-none text-gray-600" [innerHTML]="lesson()!.description"></div>
+              </div>
+
+              <!-- TEXT Content -->
+              <div *ngIf="lesson()!.type === 'TEXT' && lesson()!.content">
+                <div class="prose prose-lg max-w-none" [innerHTML]="lesson()!.content"></div>
+              </div>
+
+              <!-- QUIZ Placeholder -->
+              <div *ngIf="lesson()!.type === 'QUIZ'" class="text-center py-12">
+                <svg class="h-16 w-16 text-yellow-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Quiz Module</h3>
+                <p class="text-gray-600">Quiz functionality coming soon!</p>
+              </div>
+
+              <!-- ASSIGNMENT Placeholder -->
+              <div *ngIf="lesson()!.type === 'ASSIGNMENT'" class="text-center py-12">
+                <svg class="h-16 w-16 text-purple-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Assignment Module</h3>
+                <p class="text-gray-600">Assignment functionality coming soon!</p>
+              </div>
+
+              <!-- Mark as Complete Button -->
+              <div *ngIf="!lesson()!.progress.completed" class="mt-8 pt-8 border-t border-gray-200">
+                <button (click)="markAsCompleted()"
+                        class="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition duration-150">
+                  <svg class="inline h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Mark as Complete
+                </button>
+              </div>
+
+              <!-- Completed Message -->
+              <div *ngIf="lesson()!.progress.completed" class="mt-8 pt-8 border-t border-gray-200 text-center">
+                <div class="inline-flex items-center px-6 py-3 bg-green-100 rounded-lg">
+                  <svg class="h-6 w-6 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="text-lg font-semibold text-green-800">Lesson Completed!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="mt-6 flex items-center justify-between">
+            <button *ngIf="lesson()!.navigation.previousLessonId"
+                    (click)="goToPrevious()"
+                    class="inline-flex items-center px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition duration-150">
+              <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Previous Lesson
+            </button>
+            <div *ngIf="!lesson()!.navigation.previousLessonId"></div>
+
+            <button *ngIf="lesson()!.navigation.nextLessonId"
+                    (click)="goToNext()"
+                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-indigo-700 transition duration-150">
+              Next Lesson
+              <svg class="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+            <div *ngIf="!lesson()!.navigation.nextLessonId">
+              <a routerLink="/student/courses/my-courses"
+                 class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition duration-150">
+                Back to My Courses
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Progress Sidebar (1 column) -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Progress</h3>
+
+            <!-- Progress Circle -->
+            <div class="mb-6">
+              <div class="relative w-32 h-32 mx-auto">
+                <svg class="w-32 h-32 transform -rotate-90">
+                  <circle cx="64" cy="64" r="56" stroke="currentColor" stroke-width="8" fill="none" class="text-gray-200"/>
+                  <circle cx="64" cy="64" r="56" stroke="currentColor" stroke-width="8" fill="none"
+                          class="text-purple-600 transition-all duration-300"
+                          [attr.stroke-dasharray]="2 * Math.PI * 56"
+                          [attr.stroke-dashoffset]="2 * Math.PI * 56 * (1 - lesson()!.progress.progressPercent / 100)"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span class="text-2xl font-bold text-gray-900">{{ lesson()!.progress.progressPercent }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="space-y-3 text-sm">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-600">Status</span>
+                <span class="font-medium" [class.text-green-600]="lesson()!.progress.completed" [class.text-blue-600]="!lesson()!.progress.completed">
+                  {{ lesson()!.progress.completed ? 'Completed' : 'In Progress' }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-600">Lesson</span>
+                <span class="font-medium text-gray-900">
+                  {{ lesson()!.navigation.lessonNumber }} / {{ lesson()!.navigation.totalLessons }}
+                </span>
+              </div>
+              <div *ngIf="lesson()!.durationSeconds" class="flex items-center justify-between">
+                <span class="text-gray-600">Duration</span>
+                <span class="font-medium text-gray-900">
+                  {{ Math.floor((lesson()!.durationSeconds ?? 0) / 60) }} min
+                </span>
+              </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <h4 class="text-sm font-semibold text-gray-900 mb-2">💡 Quick Tip</h4>
+              <p class="text-xs text-gray-600">
+                Mark lessons as complete to track your progress and unlock certificates!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

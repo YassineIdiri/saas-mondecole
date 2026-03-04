@@ -1,29 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-homepage',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './homepage.component.html'
 })
-export class HomepageComponent {
-  username: string | null = null;
-  isLoggingOut = false;
+export class HomepageComponent implements OnInit {
 
-  constructor(private authService: AuthService) {
-    this.username = this.authService.getCurrentUsername();
-  }
+  // ✅ Signals
+  username = signal<string | null>(null);
+  isAdmin = signal(false);
+  isTeacher = signal(false);
 
-  onLogout(): void {
-    this.isLoggingOut = true;
-    this.authService.logout().subscribe({
-      error: (error) => {
-        console.error('Logout error:', error);
-        this.isLoggingOut = false;
-        this.authService.clearToken();
-      }
-    });
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.username.set(this.authService.getCurrentUsername());
+    this.isAdmin.set(this.authService.isAdmin());
+    this.isTeacher.set(this.authService.isTeacher());
   }
 }

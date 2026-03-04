@@ -1,1 +1,5 @@
-<router-outlet />
+<!-- Plus besoin de *ngIf ou de isNavigating -->
+<!-- APP_INITIALIZER garantit que l'auth est vérifiée avant tout rendu -->
+
+<app-navbar *ngIf="authService.isLoggedIn()"></app-navbar>
+<router-outlet></router-outlet>

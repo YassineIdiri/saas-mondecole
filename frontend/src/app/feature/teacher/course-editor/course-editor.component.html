@@ -1,0 +1,182 @@
+<div class="min-h-screen bg-slate-950">
+
+  <!-- Loading initial -->
+  <div *ngIf="loading() && !course()" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <svg class="animate-spin h-8 w-8 text-violet-500 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-slate-400 mt-3 text-sm">Chargement...</p>
+    </div>
+  </div>
+
+  <div *ngIf="course()">
+
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <button
+              (click)="onBack()"
+              class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-150">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-2xl font-bold text-white tracking-tight">{{ course()!.title }}</h1>
+              <p class="mt-0.5 text-sm text-slate-400">Gestion des sections</p>
+            </div>
+          </div>
+          <button
+            *ngIf="!showSectionForm()"
+            (click)="onAddSection()"
+            class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-500 transition-all duration-150">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Ajouter une section
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+      <!-- Error -->
+      <div *ngIf="error()" class="bg-red-950 border border-red-800 rounded-xl p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <svg class="h-5 w-5 text-red-400 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <p class="text-sm text-red-300">{{ error() }}</p>
+          </div>
+          <button (click)="error.set(null)" class="text-red-400 hover:text-red-200 transition-colors">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section Form -->
+      <div *ngIf="showSectionForm()" class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-6">
+          {{ editingSection() ? 'Modifier la section' : 'Nouvelle section' }}
+        </h2>
+
+        <div class="mb-5">
+          <label class="block text-sm font-medium text-slate-300 mb-2">
+            Titre <span class="text-violet-400">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="sectionForm.title"
+            placeholder="Ex: Introduction à Java"
+            class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150">
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-slate-300 mb-2">Description</label>
+          <textarea
+            [(ngModel)]="sectionForm.description"
+            rows="3"
+            placeholder="Description de la section (optionnel)"
+            class="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-150 resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3">
+          <button
+            (click)="onCancel()"
+            class="px-5 py-2.5 text-sm font-medium text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 hover:text-white transition-all duration-150">
+            Annuler
+          </button>
+          <button
+            (click)="onSaveSection()"
+            [disabled]="loading() || !sectionForm.title"
+            class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150">
+            <svg *ngIf="loading()" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ editingSection() ? 'Mettre à jour' : 'Créer la section' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Sections List -->
+      <div *ngIf="!showSectionForm()" class="space-y-3">
+
+        <!-- Empty State -->
+        <div *ngIf="sections().length === 0" class="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
+          <svg class="h-12 w-12 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <h3 class="text-base font-semibold text-white mb-1">Aucune section pour le moment</h3>
+          <p class="text-sm text-slate-400 mb-6">Commencez par créer votre première section pour organiser votre cours</p>
+          <button
+            (click)="onAddSection()"
+            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-500 transition-all duration-150">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Créer la première section
+          </button>
+        </div>
+
+        <!-- Section Cards -->
+        <div
+          *ngFor="let section of sections(); let i = index"
+          class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex items-start gap-5 hover:border-slate-700 transition-all duration-150">
+
+          <!-- Index -->
+          <div class="shrink-0 w-9 h-9 flex items-center justify-center bg-slate-800 border border-slate-700 rounded-lg text-sm font-bold text-slate-400">
+            {{ i + 1 }}
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-1">
+              <h3 class="text-base font-semibold text-white truncate">{{ section.title }}</h3>
+              <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-xs text-slate-400 bg-slate-800 rounded-full">
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.876V15.5a1 1 0 01-1.447.894L15 14M3 8.5A1.5 1.5 0 014.5 7h8A1.5 1.5 0 0114 8.5v7a1.5 1.5 0 01-1.5 1.5h-8A1.5 1.5 0 013 15.5v-7z"/>
+                </svg>
+                {{ section.lessonCount }} leçon{{ section.lessonCount > 1 ? 's' : '' }}
+              </span>
+            </div>
+            <p *ngIf="section.description" class="text-sm text-slate-400 line-clamp-2">
+              {{ section.description }}
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="shrink-0 flex items-center gap-2">
+            <button
+              (click)="onManageLessons(section.id)"
+              class="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-violet-400 bg-violet-950 border border-violet-800 rounded-lg hover:bg-violet-900 transition-all duration-150">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+              </svg>
+              Leçons
+            </button>
+            <button
+              (click)="onEditSection(section)"
+              class="px-3 py-2 text-xs font-medium text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 hover:text-white transition-all duration-150">
+              Modifier
+            </button>
+            <button
+              (click)="onDeleteSection(section.id)"
+              class="px-3 py-2 text-xs font-medium text-red-400 border border-red-900 rounded-lg hover:bg-red-950 transition-all duration-150">
+              Supprimer
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

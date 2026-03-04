@@ -1,0 +1,439 @@
+<div class="min-h-screen flex items-center justify-center bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
+
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-400/10 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"></div>
+    <div class="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-sky-300/10 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-slate-200/40 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="max-w-3xl w-full relative z-10">
+
+    <div *ngIf="successData()" class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-blue-900/5 border border-white/60 p-10 text-center animate-fade-in-up">
+
+      <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-emerald-50 mb-6 ring-8 ring-emerald-50/50">
+        <svg class="h-10 w-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+
+      <h2 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">
+        Organisation créée ! 🚀
+      </h2>
+
+      <p class="text-slate-500 text-lg mb-8">
+        Bienvenue chez <span class="font-semibold text-slate-800">{{ successData().organizationName }}</span>
+      </p>
+
+      <div class="bg-slate-50 rounded-2xl border border-slate-200 p-8 mb-8 text-left shadow-sm">
+        <h3 class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-6 border-b border-slate-200 pb-2">Information Importantes</h3>
+
+        <div class="space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between group">
+            <span class="text-sm font-medium text-slate-500">Nom de l'organisation</span>
+            <span class="text-slate-900 font-bold text-lg">{{ successData().organizationName }}</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between group">
+             <span class="text-sm font-medium text-slate-500">Compte Administrateur</span>
+             <span class="text-slate-900 font-medium font-mono bg-white px-2 py-1 rounded border border-slate-200">{{ successData().adminUser.username }}</span>
+          </div>
+
+          <div class="flex flex-col sm:items-start gap-2 pt-2">
+            <span class="text-sm font-medium text-slate-500">Code d'invitation (Requis pour rejoindre)</span>
+            <div class="w-full flex items-center gap-2">
+              <code class="flex-1 bg-white px-4 py-3 rounded-xl border-2 border-dashed border-blue-300 font-mono text-xl font-bold text-blue-600 tracking-wider text-center select-all">
+                {{ successData().invitationCode }}
+              </code>
+              <button
+                (click)="copyInvitationCode(successData().invitationCode)"
+                class="p-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition-colors border border-blue-200"
+                title="Copier le code">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg">
+          <div class="flex items-start">
+            <svg class="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-amber-800 leading-relaxed">
+                <strong>Important :</strong> Sauvegardez ce code maintenant. Transmettez-le à vos professeurs et étudiants pour qu'ils puissent rejoindre votre structure.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-center">
+        <button
+          (click)="goToLogin()"
+          class="w-full sm:w-auto px-10 py-4 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 hover:-translate-y-0.5 transition-all duration-200">
+          Accéder à la connexion
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!successData()" class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-12">
+
+      <div class="text-center mb-10">
+         <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 text-white font-bold text-xl shadow-lg shadow-blue-500/20 mb-6">
+            A
+         </div>
+        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+          Créez votre structure
+        </h2>
+        <p class="mt-2 text-slate-500">
+          Rejoignez l'excellence académique en quelques étapes.
+        </p>
+      </div>
+
+      <div class="mb-12">
+        <div class="relative">
+             <div class="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-slate-100">
+                <div [class.w-1/3]="currentStep() === 1" [class.w-2/3]="currentStep() === 2" [class.w-full]="currentStep() === 3"
+                     class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600 transition-all duration-500 ease-out"></div>
+             </div>
+             <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                 <span [class.text-blue-600]="currentStep() >= 1">1. Identité</span>
+                 <span [class.text-blue-600]="currentStep() >= 2">2. Localisation</span>
+                 <span [class.text-blue-600]="currentStep() >= 3">3. Admin</span>
+             </div>
+        </div>
+      </div>
+
+      <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()">
+
+        <div *ngIf="currentStep() === 1" class="space-y-6 animate-fade-in">
+          <div>
+            <label for="name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Nom de l'organisation <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              [class.border-red-300]="(name?.invalid && name?.touched) || getFieldError('name')"
+              [class.bg-red-50]="(name?.invalid && name?.touched)"
+              placeholder="Ex: École Supérieure du Web"
+            />
+            <p *ngIf="name?.invalid && name?.touched" class="mt-2 text-xs font-medium text-red-500 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span *ngIf="name?.errors?.['required']">Le nom est requis</span>
+              <span *ngIf="name?.errors?.['minlength']">Minimum 3 caractères</span>
+            </p>
+          </div>
+
+          <div>
+            <label for="type" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Type de structure <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+                <select
+                id="type"
+                formControlName="type"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 appearance-none cursor-pointer">
+                <option *ngFor="let orgType of organizationTypes" [value]="orgType.value">
+                    {{ orgType.label }}
+                </option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="email" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Email Pro <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                [class.border-red-300]="(email?.invalid && email?.touched) || getFieldError('email')"
+                placeholder="contact@ecole.com"
+              />
+              <p *ngIf="email?.invalid && email?.touched" class="mt-2 text-xs font-medium text-red-500">
+                <span *ngIf="email?.errors?.['required']">Email requis</span>
+                <span *ngIf="email?.errors?.['email']">Format invalide</span>
+              </p>
+            </div>
+
+            <div>
+              <label for="phone" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Téléphone
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                formControlName="phone"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                placeholder="+33 1 23 45 67 89"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="website" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Site Web
+            </label>
+            <input
+              id="website"
+              type="url"
+              formControlName="website"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              placeholder="https://www.monsite.com"
+            />
+          </div>
+
+          <div>
+            <label for="description" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Description
+            </label>
+            <textarea
+              id="description"
+              formControlName="description"
+              rows="3"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400 resize-none"
+              placeholder="Quelques mots sur votre établissement..."></textarea>
+          </div>
+        </div>
+
+        <div *ngIf="currentStep() === 2" class="space-y-6 animate-fade-in">
+          <div>
+            <label for="address" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Adresse
+            </label>
+            <input
+              id="address"
+              type="text"
+              formControlName="address"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              placeholder="123 Rue de la Réussite"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="city" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Ville
+              </label>
+              <input
+                id="city"
+                type="text"
+                formControlName="city"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                placeholder="Paris"
+              />
+            </div>
+
+            <div>
+              <label for="postalCode" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Code Postal
+              </label>
+              <input
+                id="postalCode"
+                type="text"
+                formControlName="postalCode"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                placeholder="75001"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="country" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Pays
+            </label>
+            <input
+              id="country"
+              type="text"
+              formControlName="country"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              placeholder="France"
+            />
+          </div>
+        </div>
+
+        <div *ngIf="currentStep() === 3" class="space-y-6 animate-fade-in">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="adminFirstName" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Prénom <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="adminFirstName"
+                type="text"
+                formControlName="adminFirstName"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                [class.border-red-300]="adminFirstName?.invalid && adminFirstName?.touched"
+                placeholder="Jean"
+              />
+            </div>
+
+            <div>
+              <label for="adminLastName" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                Nom <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="adminLastName"
+                type="text"
+                formControlName="adminLastName"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                [class.border-red-300]="adminLastName?.invalid && adminLastName?.touched"
+                placeholder="Dupont"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="adminUsername" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Nom d'utilisateur <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-slate-400">@</span>
+                </div>
+                <input
+                id="adminUsername"
+                type="text"
+                formControlName="adminUsername"
+                class="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+                [class.border-red-300]="(adminUsername?.invalid && adminUsername?.touched) || getFieldError('adminUsername')"
+                placeholder="admin"
+                />
+            </div>
+            <p *ngIf="adminUsername?.invalid && adminUsername?.touched" class="mt-2 text-xs font-medium text-red-500">
+               Requis (lettres, chiffres, - _)
+            </p>
+          </div>
+
+          <div>
+            <label for="adminEmail" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Email Admin <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="adminEmail"
+              type="email"
+              formControlName="adminEmail"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              [class.border-red-300]="(adminEmail?.invalid && adminEmail?.touched) || getFieldError('adminEmail')"
+              placeholder="admin@ecole.com"
+            />
+          </div>
+
+          <div>
+            <label for="adminPassword" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Mot de passe <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="adminPassword"
+              type="password"
+              formControlName="adminPassword"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              [class.border-red-300]="(adminPassword?.invalid && adminPassword?.touched) || getFieldError('adminPassword')"
+              placeholder="••••••••"
+            />
+            <p *ngIf="adminPassword?.invalid && adminPassword?.touched" class="mt-2 text-xs text-slate-400">
+               8+ caractères, majuscule, chiffre et caractère spécial requis.
+            </p>
+          </div>
+
+          <div>
+            <label for="adminPasswordConfirm" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+              Confirmer mot de passe <span class="text-red-500">*</span>
+            </label>
+            <input
+              id="adminPasswordConfirm"
+              type="password"
+              formControlName="adminPasswordConfirm"
+              class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900 placeholder:text-slate-400"
+              [class.border-red-300]="adminPasswordConfirm?.invalid && adminPasswordConfirm?.touched"
+              placeholder="••••••••"
+            />
+             <p *ngIf="organizationForm.errors?.['passwordMismatch'] && adminPasswordConfirm?.touched" class="mt-2 text-xs font-medium text-red-500">
+              Les mots de passe ne correspondent pas.
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage()" class="mt-8 rounded-xl bg-red-50 border border-red-100 p-4 animate-shake">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <p class="ml-3 text-sm font-medium text-red-800">{{ errorMessage() }}</p>
+          </div>
+        </div>
+
+        <div class="mt-10 flex items-center justify-between pt-6 border-t border-slate-100">
+
+            <div>
+                 <button
+                type="button"
+                *ngIf="currentStep() > 1"
+                (click)="previousStep()"
+                class="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-slate-900 transition duration-200 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Retour
+                </button>
+            </div>
+
+            <div>
+                <button
+                    type="button"
+                    *ngIf="currentStep() < totalSteps"
+                    (click)="nextStep()"
+                    [disabled]="!isStepValid(currentStep())"
+                    class="group px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none transition-all duration-200 flex items-center gap-2">
+                    Suivant
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+
+                <div class="mt-4 text-center">
+  <button
+    type="button"
+    (click)="debugForm()"
+    class="text-xs px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg">
+    🐛 Debug Form (voir console)
+  </button>
+</div>
+
+                <button
+                    type="submit"
+                    *ngIf="currentStep() === totalSteps"
+                    [disabled]="loading() || organizationForm.invalid"
+                    class="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-xl hover:bg-slate-800 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-wait disabled:transform-none transition-all duration-200">
+                    <span *ngIf="!loading()">Finaliser la création</span>
+                    <span *ngIf="loading()" class="flex items-center">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Création en cours...
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <p class="text-sm text-slate-500">
+            Votre organisation existe déjà ?
+            <a routerLink="/login" class="font-bold text-blue-600 hover:text-blue-700 hover:underline transition duration-150">
+              Se connecter
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

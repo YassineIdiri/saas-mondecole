@@ -1,0 +1,214 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center gap-4">
+        <button
+          (click)="cancel()"
+          class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition duration-150">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">
+            {{ isEditMode() ? 'Edit Course' : 'Create New Course' }}
+          </h1>
+          <p class="mt-1 text-sm text-gray-600">
+            {{ isEditMode() ? 'Update your course details' : 'Fill in the details to create a new course' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Loading -->
+    <div *ngIf="loading()" class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="animate-spin h-8 w-8 text-purple-600 mx-auto" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-gray-500 mt-2">Loading course...</p>
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!loading()" [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage()" class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex items-start">
+          <svg class="h-5 w-5 text-red-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-red-800">{{ errorMessage() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basic Information -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">Basic Information</h2>
+
+        <!-- Title -->
+        <div class="mb-6">
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+            Course Title <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="e.g., Introduction to JavaScript"
+            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="title?.invalid && title?.touched">
+          <p *ngIf="title?.invalid && title?.touched" class="mt-2 text-sm text-red-600">
+            <span *ngIf="title?.errors?.['required']">Title is required</span>
+            <span *ngIf="title?.errors?.['maxlength']">Title must be less than 200 characters</span>
+          </p>
+        </div>
+
+        <!-- Summary -->
+        <div class="mb-6">
+          <label for="summary" class="block text-sm font-medium text-gray-700 mb-2">
+            Summary
+          </label>
+          <textarea
+            id="summary"
+            formControlName="summary"
+            rows="3"
+            placeholder="Brief description of the course (max 500 characters)"
+            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="summary?.invalid && summary?.touched"></textarea>
+          <p class="mt-1 text-xs text-gray-500">{{ summary?.value?.length || 0 }}/500 characters</p>
+          <p *ngIf="summary?.invalid && summary?.touched" class="mt-2 text-sm text-red-600">
+            Summary must be less than 500 characters
+          </p>
+        </div>
+
+        <!-- Category & Level -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Category -->
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
+              Category
+            </label>
+            <select
+              id="category"
+              formControlName="category"
+              class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <!-- Level -->
+          <div>
+            <label for="level" class="block text-sm font-medium text-gray-700 mb-2">
+              Level
+            </label>
+            <select
+              id="level"
+              formControlName="level"
+              class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">Select a level</option>
+              <option *ngFor="let lvl of levels" [value]="lvl">{{ lvl }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Estimated Hours -->
+        <div>
+          <label for="estimatedHours" class="block text-sm font-medium text-gray-700 mb-2">
+            Estimated Hours
+          </label>
+          <input
+            id="estimatedHours"
+            type="number"
+            formControlName="estimatedHours"
+            min="1"
+            max="1000"
+            placeholder="e.g., 10"
+            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="estimatedHours?.invalid && estimatedHours?.touched">
+          <p *ngIf="estimatedHours?.invalid && estimatedHours?.touched" class="mt-2 text-sm text-red-600">
+            Please enter a value between 1 and 1000
+          </p>
+        </div>
+      </div>
+
+      <!-- Detailed Information -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">Detailed Information</h2>
+
+        <!-- Description -->
+        <div class="mb-6">
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+            Course Description
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="6"
+            placeholder="Detailed description of what students will learn..."
+            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [class.border-red-500]="description?.invalid && description?.touched"></textarea>
+          <p class="mt-1 text-xs text-gray-500">Use this field to provide a comprehensive overview of the course content</p>
+        </div>
+
+        <!-- Objectives -->
+        <div class="mb-6">
+          <label for="objectives" class="block text-sm font-medium text-gray-700 mb-2">
+            Learning Objectives
+          </label>
+          <textarea
+            id="objectives"
+            formControlName="objectives"
+            rows="4"
+            placeholder="What will students achieve after completing this course?"
+            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+          <p class="mt-1 text-xs text-gray-500">List the key learning outcomes (one per line)</p>
+        </div>
+
+        <!-- Prerequisites -->
+        <div>
+          <label for="prerequisites" class="block text-sm font-medium text-gray-700 mb-2">
+            Prerequisites
+          </label>
+          <textarea
+            id="prerequisites"
+            formControlName="prerequisites"
+            rows="3"
+            placeholder="What should students know before taking this course?"
+            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+          <p class="mt-1 text-xs text-gray-500">List any required knowledge or skills</p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-4 bg-white rounded-lg shadow p-6">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="saving() || courseForm.invalid"
+          class="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150">
+          <span *ngIf="!saving()">{{ isEditMode() ? 'Update Course' : 'Create Course' }}</span>
+          <span *ngIf="saving()" class="flex items-center gap-2">
+            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Saving...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
