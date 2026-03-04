@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { AdminDashboardComponent } from './dashboard.component';
 
 describe('Dashboard', () => {
@@ -8,9 +8,11 @@ describe('Dashboard', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminDashboardComponent]
-    })
-    .compileComponents();
+      imports: [AdminDashboardComponent],
+      providers: [
+        provideRouter([])
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdminDashboardComponent);
     component = fixture.componentInstance;

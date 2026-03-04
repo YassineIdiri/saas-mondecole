@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
 import { JoinOrganizationComponent } from './join-organization.component';
 
 describe('JoinOrganization', () => {
@@ -8,9 +8,11 @@ describe('JoinOrganization', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [JoinOrganizationComponent]
-    })
-    .compileComponents();
+      imports: [JoinOrganizationComponent],
+      providers: [
+        provideRouter([])  // ← c'est tout ce qu'il manquait
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(JoinOrganizationComponent);
     component = fixture.componentInstance;
